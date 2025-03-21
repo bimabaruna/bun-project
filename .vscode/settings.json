@@ -1,0 +1,18 @@
+{   
+    "editor.formatOnSave": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5001,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "db",
+            "database": "bun-database",
+            "username": "bun"
+        }
+    ],
+    "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
+}
