@@ -124,6 +124,21 @@ export class UserService {
         return toUserResponse(user)
     }
 
+    static async logout(user: User): Promise<boolean>{
+
+        await prismaClient.user.update({
+            where: {
+                username: user.username
+            },
+            data: {
+                token: null
+            }
+        })
+
+        return true
+
+    }
+
     static async getList(token: string | undefined | null): Promise<UserListResponse> {
 
         token = UserValidation.USER_LIST.parse(token)
