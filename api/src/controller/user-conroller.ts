@@ -1,9 +1,10 @@
 import { Hono } from "hono";
-import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UserListResponse } from "../model/user-model";
+import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UpdateUserRequest, type UserListResponse } from "../model/user-model";
 import { UserService } from "../service/user-service";
 import { isNamedExportBindings } from "typescript";
 import type { ApplicationVatiables } from "../model/app-model";
 import type { User } from "@prisma/client";
+import { date } from "zod";
 
 
 export const userController = new Hono<{ Variables: ApplicationVatiables }>()
@@ -35,7 +36,7 @@ userController.use(async (c, next) => {
     const userListResponse = await UserService.getList(token)
 
     c.set('user', user);
-    c.set('users', userListResponse.data );
+    c.set('users', userListResponse.data);
 
     await next()
 
@@ -56,3 +57,13 @@ userController.get('/api/users', async (c) => {
         data: users
     });
 });
+
+userController.patch('/api/users/user', async (c) => {
+    const user = c.get('user') as User
+    const request = await c.req.json() as UpdateUserRequest
+
+    const response = await UserService.update(user, request)
+    return c.json({
+        data: response
+    })
+})

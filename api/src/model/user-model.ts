@@ -19,6 +19,11 @@ export type UserResponse = {
     token?: string;
 }
 
+export type UpdateUserRequest = {
+    password?: string;
+    name?: string;
+}
+
 export function toUserResponse(user: User): UserResponse {
     return {
         id: user.id,

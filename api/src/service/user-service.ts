@@ -1,10 +1,11 @@
 import { HTTPException } from "hono/http-exception";
 import { prismaClient } from "../application/database";
-import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UserListResponse, type UserResponse } from "../model/user-model";
+import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UpdateUserRequest, type UserListResponse, type UserResponse } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { sign, verify } from "hono/jwt";
 import type { User } from "@prisma/client";
 import { tokenToString } from "typescript";
+import { use } from "react";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'JWT_SECRET';
 const JWT_EXPIRES_IN = '1h';
@@ -80,7 +81,7 @@ export class UserService {
         return response
     }
 
-    static async get(token: string | undefined | null): Promise<User>{
+    static async get(token: string | undefined | null): Promise<User> {
 
         token = UserValidation.TOKEN.parse(token)
 
@@ -90,32 +91,56 @@ export class UserService {
             }
         })
 
-        if(!user){
-            throw new HTTPException(401,{
-                message:'Unathorized'
+        if (!user) {
+            throw new HTTPException(401, {
+                message: 'Unathorized'
             })
         }
 
         return user
     }
 
-    static async getList(token: string | undefined | null): Promise<UserListResponse>{
+    static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+        request = UserValidation.UPDATE.parse(request)
+
+        if (request.name) {
+            user.name = request.name
+        }
+
+        if (request.password) {
+            user.password = await Bun.password.hash(request.password, {
+                algorithm: 'bcrypt',
+                cost: 10
+            })
+        }
+
+        user = await prismaClient.user.update({
+            where: {
+                username: user.username
+            },
+            data: user
+        })
+
+        return toUserResponse(user)
+    }
+
+    static async getList(token: string | undefined | null): Promise<UserListResponse> {
 
         token = UserValidation.USER_LIST.parse(token)
-        
+
 
         let user = await prismaClient.user.findFirst({
-        where:{
+            where: {
                 token: token
             }
         })
 
         if (!user) {
-            throw new HTTPException(401,{
+            throw new HTTPException(401, {
                 message: 'Unathorized'
             })
         }
-        
+
         const userList = await prismaClient.user.findMany({
         })
 
@@ -123,7 +148,7 @@ export class UserService {
             id: user.id,
             username: user.username,
             name: user.name
-          }))
+        }))
 
         return {
             data: transformedUsers
