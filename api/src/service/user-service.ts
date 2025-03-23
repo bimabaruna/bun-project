@@ -6,6 +6,7 @@ import { sign, verify } from "hono/jwt";
 import type { User } from "@prisma/client";
 import { tokenToString } from "typescript";
 import { use } from "react";
+import { nan } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'JWT_SECRET';
 const JWT_EXPIRES_IN = '1h';
@@ -124,7 +125,7 @@ export class UserService {
         return toUserResponse(user)
     }
 
-    static async logout(user: User): Promise<boolean>{
+    static async logout(user: User): Promise<boolean> {
 
         await prismaClient.user.update({
             where: {
@@ -139,22 +140,8 @@ export class UserService {
 
     }
 
-    static async getList(token: string | undefined | null): Promise<UserListResponse> {
+    static async getList(): Promise<UserListResponse> {
 
-        token = UserValidation.USER_LIST.parse(token)
-
-
-        let user = await prismaClient.user.findFirst({
-            where: {
-                token: token
-            }
-        })
-
-        if (!user) {
-            throw new HTTPException(401, {
-                message: 'Unathorized'
-            })
-        }
 
         const userList = await prismaClient.user.findMany({
         })
@@ -168,5 +155,24 @@ export class UserService {
         return {
             data: transformedUsers
         }
+    }
+
+    static async deleteUser(id: number): Promise<boolean> {
+
+        const userExist = await prismaClient.user.count({
+            where: {
+                id: id
+            }
+        })
+        if (!userExist) {
+            return false
+        }
+        await prismaClient.user.delete({
+            where: {
+                id: id
+            }
+        })
+
+        return true
     }
 }

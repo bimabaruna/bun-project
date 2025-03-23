@@ -33,13 +33,9 @@ userController.post('/api/users/login', async (c) => {
 userController.use(async (c, next) => {
     const token = c.req.header('Authorization')
     const user = await UserService.get(token)
-    const userListResponse = await UserService.getList(token)
 
     c.set('user', user);
-    c.set('users', userListResponse.data);
-
     await next()
-
 })
 
 userController.get('/api/users/user', async (c) => {
@@ -52,10 +48,9 @@ userController.get('/api/users/user', async (c) => {
 })
 
 userController.get('/api/users', async (c) => {
-    const users = c.get('users')
-    return c.json({
-        data: users
-    });
+    const users = await UserService.getList()
+
+    return c.json(users);
 });
 
 userController.patch('/api/users/user', async (c) => {
@@ -72,6 +67,16 @@ userController.delete('/api/users/user', async (c) => {
     const user = c.get('user') as User
 
     const response = await UserService.logout(user)
+    return c.json({
+        data: response
+    })
+})
+
+userController.delete('/api/users/', async (c) => {
+    const idParam = c.req.query('id'); // Grab the query parameter
+    const id = parseInt(idParam || '');
+    const response = await UserService.deleteUser(id)
+
     return c.json({
         data: response
     })

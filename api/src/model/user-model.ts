@@ -34,4 +34,4 @@ export function toUserResponse(user: User): UserResponse {
 
 export type UserListResponse = {
     data: UserResponse[]
-  }
+}
