@@ -5,6 +5,7 @@ import { isNamedExportBindings } from "typescript";
 import type { ApplicationVatiables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { date } from "zod";
+import { authMiddleware } from "../middleware/auth-middleware";
 
 
 export const userController = new Hono<{ Variables: ApplicationVatiables }>()
@@ -30,13 +31,7 @@ userController.post('/api/users/login', async (c) => {
     })
 })
 
-userController.use(async (c, next) => {
-    const token = c.req.header('Authorization')
-    const user = await UserService.get(token)
-
-    c.set('user', user);
-    await next()
-})
+userController.use(authMiddleware)
 
 userController.get('/api/users/user', async (c) => {
 
