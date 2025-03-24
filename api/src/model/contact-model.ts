@@ -24,3 +24,11 @@ export function toContactResponse(contact: Contact): ContactResponse{
         phone: contact.phone
     }
 }
+
+export type UpdateContactRequest = {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    phone?: string;
+}
+

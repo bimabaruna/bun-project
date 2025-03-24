@@ -1,4 +1,4 @@
-import { toContactResponse, type ContactResponse, type CreateContactRequest } from "../model/contact-model";
+import { toContactResponse, type ContactResponse, type CreateContactRequest, type UpdateContactRequest } from "../model/contact-model";
 import type { Contact, User } from '@prisma/client';
 import { contactValidation } from "../validation/contact-validation";
 import { prismaClient } from "../application/database";
@@ -52,5 +52,38 @@ export class ContactService {
         }
 
         return toContactResponse(contact)
+    }
+
+    static async update(user: User, request: UpdateContactRequest): Promise<ContactResponse>{
+
+        request = contactValidation.UPDATE.parse(request)
+
+        const contact = await prismaClient.contact.update({
+            where: {
+                id: user.id
+            }, 
+            data: {
+                user_id: user.id,
+                first_name: request.first_name, 
+                last_name: request.last_name,   
+                email: request.email,           
+                phone: request.phone    
+            }
+        })
+
+        return toContactResponse(contact)
+    }
+
+    static async delete(contactId: number): Promise<boolean>{
+        
+        contactId = contactValidation.DELETE.parse(contactId)
+        
+        await prismaClient.contact.delete({
+            where:{
+                id: contactId
+            }
+        })
+
+        return true
     }
 } 
