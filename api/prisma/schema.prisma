@@ -54,3 +54,14 @@ model Address {
 
   @@map("addresses")
 }
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  name       String
+  price      Decimal
+  quantity   Int
+  created_at DateTime @default(now())
+  created_by String
+  updated_at DateTime? @updatedAt
+  updated_by String?
+}

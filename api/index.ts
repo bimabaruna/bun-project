@@ -4,29 +4,31 @@ import { error } from "winston";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 import { contactController } from "./src/controller/contact-controller";
+import { productController } from "./src/controller/product-controller";
 
 
 const app = new Hono()
 
-app.get('/',(c) => {
+app.get('/', (c) => {
     return c.text('hello')
 })
 
 app.route('/', userController)
 app.route('/', contactController)
+app.route('/', productController)
 
-app.onError(async(err, c)=>{
-    if(err instanceof HTTPException){
+app.onError(async (err, c) => {
+    if (err instanceof HTTPException) {
         c.status(err.status)
         return c.json({
             errors: err.message
         })
-    }else if (err instanceof ZodError){
+    } else if (err instanceof ZodError) {
         c.status(400)
         return c.json({
             errors: err.message
         })
-    }else {
+    } else {
         c.status(500)
         return c.json({
             errors: err.message

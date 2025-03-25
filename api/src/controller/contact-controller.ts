@@ -1,6 +1,4 @@
 import { Hono } from "hono";
-import { type RegisterUserRequest } from "../model/user-model";
-import { UserService } from "../service/user-service";
 import type { ApplicationVatiables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
