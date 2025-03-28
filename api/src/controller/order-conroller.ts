@@ -22,3 +22,14 @@ orderController.post('/api/order', async (c) =>{
         data: response
     })
 })
+
+orderController.get('/api/order/:id', async (c) => {
+    const user = c.get('user') as User
+    const request = c.req.param('id')
+
+    const response = await OrderService.getById(user, request)
+
+    return c.json({
+        data: response
+    })
+})
