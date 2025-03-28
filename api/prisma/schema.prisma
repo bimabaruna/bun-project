@@ -21,6 +21,7 @@ model User {
   token    String?
 
   contacts Contact[]
+  orders   Order[]
 
   @@map("users")
 }
@@ -56,12 +57,57 @@ model Address {
 }
 
 model Product {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   price      Decimal
   quantity   Int
-  created_at DateTime @default(now())
+  created_at DateTime  @default(now())
   created_by String
   updated_at DateTime? @updatedAt
   updated_by String?
+
+  order_items OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  customer_id Int
+  order_date  DateTime @default(now())
+  total_price Decimal @db.Decimal(10, 2)
+  status      String  @default("on_progress")
+
+  order_items OrderItem[]
+  payments    Payment[]
+
+  user User @relation(fields: [customer_id], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id             Int     @id @default(autoincrement())
+  order_id       Int
+  product_id     Int
+  quantity       Int
+  price_at_order Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id           Int      @id @default(autoincrement())
+  order_id     Int
+  payment_date DateTime @default(now())
+  amount       Decimal @db.Decimal(10, 2)
+  status       String   @default("paid")
+
+  method String
+  order  Order  @relation(fields: [order_id], references: [id])
+
+  @@map("payments")
 }
