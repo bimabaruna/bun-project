@@ -14,4 +14,8 @@ export class productValidation  {
         price: z.number().int(),
         quantity: z.number().int().positive() 
     })
+
+    static readonly GET: ZodType = z.number().positive()
+
+    static readonly DELETE : ZodType = z.number().positive()
 }

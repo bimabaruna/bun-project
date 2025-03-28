@@ -42,5 +42,22 @@ productController.patch('api/products/:id', async (c) => {
     return c.json({
         data: response
     })
+})
 
+productController.get('/api/products/:id', async (c) => {
+    const product_id = Number(c.req.param('id'))
+    const response = await ProductService.get(product_id)
+
+    return c.json({
+        data: response
+    })
+})
+
+productController.delete('api/products/:id', async (c) => {
+    const product_id = Number(c.req.param('id'))
+    const response = await ProductService.delete(product_id)
+
+    return c.json({
+        data: response
+    })
 })

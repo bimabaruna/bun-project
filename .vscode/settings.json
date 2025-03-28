@@ -1,5 +1,6 @@
-{   
+{
     "editor.formatOnSave": true,
+    "github.copilot.editor.enableAutoCompletions": false,
     "sqltools.connections": [
         {
             "previewLimit": 50,
@@ -13,6 +14,6 @@
         }
     ],
     "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
-  }
+        "editor.defaultFormatter": "Prisma.prisma"
+    }
 }

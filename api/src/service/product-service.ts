@@ -4,6 +4,7 @@ import { productValidation } from "../validation/product-validation";
 import { prismaClient } from "../application/database";
 import { use } from "react";
 import { date } from "zod";
+import { HTTPException } from "hono/http-exception";
 
 export class ProductService {
 
@@ -39,11 +40,11 @@ export class ProductService {
             page: page,
             size: size,
             products: mapped
-            
+
         }
     }
 
-    static async update(product_id: string, request: UpdateProductRequest, user: User): Promise<ProductResponse>{
+    static async update(product_id: string, request: UpdateProductRequest, user: User): Promise<ProductResponse> {
 
         request = productValidation.UPDATE.parse(request)
 
@@ -64,5 +65,46 @@ export class ProductService {
 
         return toProductResponse(product)
 
+    }
+
+    static async get(product_id: number): Promise<ProductResponse> {
+        product_id = productValidation.GET.parse(product_id)
+
+        const product = await prismaClient.product.findFirst({
+            where: {
+                id: product_id
+            }
+        })
+
+        if (!product) {
+            throw new Error('Product not found')
+        }
+
+        return toProductResponse(product)
+    }
+
+    static async delete(product_id: number): Promise<ProductResponse> {
+
+        product_id = productValidation.DELETE.parse(product_id)
+
+        const getProduct = await prismaClient.product.findFirst({
+            where: {
+                id: product_id
+            }
+        })
+
+        if (!getProduct) {
+            throw new HTTPException(400, {
+                message: "Product Not Found"
+            })
+        }
+
+        const product = await prismaClient.product.delete({
+            where: {
+                id: product_id
+            }
+        })
+
+        return toProductResponse(product)
     }
 }
