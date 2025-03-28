@@ -2,7 +2,7 @@ import { Hono } from "hono"
 import type { ApplicationVatiables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
-import type { CreateProductRequest } from "../model/product-model";
+import type { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
 import { ProductService } from "../service/product-service";
 
 
@@ -30,4 +30,17 @@ productController.get('/api/products', async (c) => {
     const response = await ProductService.getList(page, size)
     console.log(response);
     return c.json(response)
+})
+
+productController.patch('api/products/:id', async (c) => {
+
+    const user = c.get('user') as User
+    const product_id = c.req.param('id')
+    const request = await c.req.json() as UpdateProductRequest
+    const response = await ProductService.update(product_id, request, user)
+
+    return c.json({
+        data: response
+    })
+
 })

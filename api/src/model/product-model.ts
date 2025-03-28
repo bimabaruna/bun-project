@@ -13,6 +13,14 @@ export type ProductResponse = {
     quantity: number;
     created_at?: Date;
     created_by?: string;
+    updated_at?: Date;
+    updated_by?: string;
+}
+
+export type UpdateProductRequest = {
+    name: string;
+    price: number;
+    quantity: number;
 }
 
 export function toProductResponse(product: Product): ProductResponse {
@@ -22,7 +30,9 @@ export function toProductResponse(product: Product): ProductResponse {
         price: Number(product.price),
         quantity: product.quantity,
         created_at: product.created_at,
-        created_by: product.created_by
+        created_by: product.created_by,
+        updated_at: product.updated_at ?? undefined,
+        updated_by: product.updated_by ?? undefined
     }
 }
 
