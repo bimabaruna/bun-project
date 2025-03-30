@@ -8,6 +8,7 @@ export type CreateOrderRequest = {
 export type OrderItems = {
     product_id: number;
     quantity: number;
+    product_name: string
 }
 
 export type OrderResponse = {
@@ -19,7 +20,7 @@ export type OrderResponse = {
 
 export function toOrderResponse(order: Order & { 
     order_items: { 
-        product_id: number; quantity: number 
+        product_id: number; quantity: number ; product: { name: string }
     }[] 
 }): OrderResponse {
     return {
@@ -27,7 +28,8 @@ export function toOrderResponse(order: Order & {
         customer_id: order.customer_id,
         items: order.order_items.map(item => ({
             product_id: item.product_id, 
-            quantity: item.quantity
+            quantity: item.quantity,
+            product_name: item.product.name
         })),
         total_price: order.total_price
     }
