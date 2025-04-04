@@ -33,3 +33,16 @@ orderController.get('/api/order/:id', async (c) => {
         data: response
     })
 })
+
+orderController.post('api/order/:id/cancel', async (c) => {
+
+    const user = c.get('user') as User
+    const request = Number(c.req.param('id'))
+
+    const response = await OrderService.cancel(user, request)
+
+    return c.json({
+        data: response
+    })
+
+})

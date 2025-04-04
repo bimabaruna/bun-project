@@ -10,4 +10,6 @@ export class orderValidation {
             })
         )
     })
+    static readonly CANCEL: ZodType = z.number().positive()
+
 }
