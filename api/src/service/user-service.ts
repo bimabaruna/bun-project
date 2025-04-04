@@ -65,7 +65,10 @@ export class UserService {
             })
         }
 
-        const token = await sign(user, JWT_SECRET)
+        const token = await sign(
+            { id: user.id, username: user.username }, 
+            JWT_SECRET
+          )
 
         user = await prismaClient.user.update({
             where: {

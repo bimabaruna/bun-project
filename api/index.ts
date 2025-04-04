@@ -7,9 +7,15 @@ import { contactController } from "./src/controller/contact-controller";
 import { productController } from "./src/controller/product-controller";
 import { orderController } from "./src/controller/order-conroller";
 import { paymentController } from "./src/controller/payment-controller";
-
+import { cors } from "hono/cors";
 
 const app = new Hono()
+
+app.use('*', cors({
+    origin: "http://localhost:5173",
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+  }))
 
 app.get('/', (c) => {
     return c.text('hello')

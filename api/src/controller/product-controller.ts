@@ -24,8 +24,8 @@ productController.post('/api/products', async (c) => {
 
 productController.get('/api/products', async (c) => {
 
-    const size = Number(c.req.header('size'))
-    const page = Number(c.req.header('page'))
+    const size = Number(c.req.query('size'))
+    const page = Number(c.req.query('page'))
 
     const response = await ProductService.getList(page, size)
     console.log(response);
