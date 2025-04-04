@@ -2,13 +2,13 @@ import { Hono } from "hono";
 import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UpdateUserRequest, type UserListResponse } from "../model/user-model";
 import { UserService } from "../service/user-service";
 import { isNamedExportBindings } from "typescript";
-import type { ApplicationVatiables } from "../model/app-model";
+import type { ApplicationVariables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { date } from "zod";
 import { authMiddleware } from "../middleware/auth-middleware";
 
 
-export const userController = new Hono<{ Variables: ApplicationVatiables }>()
+export const userController = new Hono<{ Variables: ApplicationVariables }>()
 
 
 userController.post('/api/users', async (c) => {

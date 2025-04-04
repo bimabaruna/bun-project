@@ -15,6 +15,7 @@ export type OrderResponse = {
     id: number;
     customer_id: number;
     total_price: Decimal;
+    status: string
     items: OrderItems[]
 }
 
@@ -26,6 +27,7 @@ export function toOrderResponse(order: Order & {
     return {
         id: order.id,
         customer_id: order.customer_id,
+        status: order.status,
         items: order.order_items.map(item => ({
             product_id: item.product_id, 
             quantity: item.quantity,

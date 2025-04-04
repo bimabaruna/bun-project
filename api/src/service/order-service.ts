@@ -104,6 +104,7 @@ export class OrderService {
             id: Number(order.id),
             customer_id: user.id,
             total_price: order.total_price,
+            status: order.status,
             items: order.order_items.map(item => ({
                 product_id: item.product_id,
                 quantity: item.quantity,
@@ -136,7 +137,7 @@ export class OrderService {
             })
         }
 
-        const cancellableStatuses = ["on_progress", "pending_payment", "paid"];
+        const cancellableStatuses = ["on_progress", "pending_payment"];
 
         if (!cancellableStatuses.includes(order.status)){
             throw new HTTPException(400,{

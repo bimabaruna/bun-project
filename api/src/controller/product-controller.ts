@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import type { ApplicationVatiables } from "../model/app-model";
+import type { ApplicationVariables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
 import type { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
@@ -7,7 +7,7 @@ import { ProductService } from "../service/product-service";
 
 
 
-export const productController = new Hono<{ Variables: ApplicationVatiables }>()
+export const productController = new Hono<{ Variables: ApplicationVariables }>()
 
 productController.use(authMiddleware)
 

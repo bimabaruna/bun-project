@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import type { ApplicationVatiables } from "../model/app-model";
+import type { ApplicationVariables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
 import type { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
@@ -8,7 +8,7 @@ import type { CreateOrderRequest } from "../model/order-model";
 import { OrderService } from "../service/order-service";
 
 
-export const orderController = new Hono<{ Variables: ApplicationVatiables }>()
+export const orderController = new Hono<{ Variables: ApplicationVariables }>()
 
 orderController.use(authMiddleware)
 

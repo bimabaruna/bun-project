@@ -1,12 +1,12 @@
 import { Hono } from "hono";
-import type { ApplicationVatiables } from "../model/app-model";
+import type { ApplicationVariables } from "../model/app-model";
 import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { ContactService } from "../service/contact-service";
 import type { CreateContactRequest, UpdateContactRequest } from "../model/contact-model";
 
 
-export const contactController = new Hono<{ Variables: ApplicationVatiables }>()
+export const contactController = new Hono<{ Variables: ApplicationVariables }>()
 
 contactController.use(authMiddleware)
 
