@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",  // Pastikan JSX diatur ke react-jsx
+    "allowJs": true,      // Izinkan file JS/JSX
+    "noImplicitAny": false // Agar tidak error pada `any` yang tidak ditentukan
+  }
+}
