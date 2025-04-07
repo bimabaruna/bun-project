@@ -6,6 +6,7 @@ import './index.css'
 import LoginForm from "./LoginForm"
 import HomePage from './HomePage'
 import ProductList from './components/ProductList'
+import CreateProduct from './pages/CreateProduct'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/dashboard" element={<HomePage />}>
           <Route index element={<div>Welcome to Home Page!</div>} />
           <Route path="products" element={<ProductList />} />
+          <Route path="products/create-product" element={<CreateProduct />} />
         </Route>
       </Routes>
     </BrowserRouter>
