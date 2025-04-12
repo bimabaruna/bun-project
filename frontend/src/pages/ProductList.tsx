@@ -1,8 +1,8 @@
 import { useProducts } from '../hooks/useProduct';
-import { LoadingIndicator } from './LoadingIndicator';
-import { EmptyState } from './EmptyState';
-import { ProductTable } from './ProductTable';
-import { Pagination } from './Pagination';
+import { LoadingIndicator } from '../components/LoadingIndicator';
+import { EmptyState } from '../components/EmptyState';
+import { ProductTable } from '../components/ProductTable';
+import { Pagination } from '../components/Pagination';
 
 export default function ProductList() {
     const {
@@ -29,7 +29,7 @@ export default function ProductList() {
 
                     <Pagination
                         pageNumber={pageNumber}
-                        
+
                         onPrev={handlePrev}
                         onNext={handleNext}
                         isFirstPage={pageNumber === 0}

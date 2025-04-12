@@ -5,7 +5,7 @@ import './index.css'
 // import App from './App.tsx'
 import LoginForm from "./LoginForm"
 import HomePage from './HomePage'
-import ProductList from './components/ProductList'
+import ProductList from './pages/ProductList'
 import CreateProduct from './pages/CreateProduct'
 
 

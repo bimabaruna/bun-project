@@ -6,11 +6,21 @@ export default function LoginForm() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{username?: string, password?: string}>({});
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    const newErrors : {username?: string, password?: string} = {};
+
+    if(!username) newErrors.username  ="Username is required"
+    if(!password) newErrors.password = "Passwword is required"
+
+    if(Object.keys(newErrors).length > 0 ){
+      setErrors(newErrors)
+      return 
+    }
 
     try {
       const response = await axios.post(
@@ -40,9 +50,17 @@ export default function LoginForm() {
               type="text"
               className="w-full px-4 py-2 mt-1 border rounded-md focus:ring focus:ring-indigo-300"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
+              onChange={(e) => {
+                setUsername(e.target.value)
+                if (errors.username) {
+                  setErrors((prev) => ({ ...prev, username: undefined }));
+                }
+              
+              }}
+              
+            />{errors.username && (
+              <label className="text-sm font-small text-red-500">{errors.username}</label>
+            )}
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-600">Password</label>
@@ -50,9 +68,17 @@ export default function LoginForm() {
               type="password"
               className="w-full px-4 py-2 mt-1 border rounded-md focus:ring focus:ring-indigo-300"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (errors.password) {
+                  setErrors((prev) => ({ ...prev, password: undefined }));
+                }
+              
+              }}
+              
+            />{errors.password && (
+              <label className="text-sm font-small text-red-500">{errors.password}</label>
+            )}
           </div>
           <button
             type="submit"

@@ -115,64 +115,64 @@ export class OrderService {
 
         }
     }
-    static async cancel(user: User, id: number): Promise<{}>{
+    static async cancel(user: User, id: number): Promise<{}> {
         id = orderValidation.CANCEL.parse(id)
 
         const order = await prismaClient.order.findFirst({
-            where:{
+            where: {
                 id: id
-            }, include:{
-                order_items:{
-                    include:{
+            }, include: {
+                order_items: {
+                    include: {
                         product: true
                     }
                 }
             }
-            
+
         })
 
-        if (!order){
-            throw new HTTPException(400,{
+        if (!order) {
+            throw new HTTPException(400, {
                 message: "Order not found"
             })
         }
 
         const cancellableStatuses = ["on_progress", "pending_payment"];
 
-        if (!cancellableStatuses.includes(order.status)){
-            throw new HTTPException(400,{
+        if (!cancellableStatuses.includes(order.status)) {
+            throw new HTTPException(400, {
                 message: `Order cannot be cancelled in its current status: ${order.status}`
             })
         }
 
         await Promise.all(order.order_items.map(item =>
             prismaClient.product.update({
-                where:{
+                where: {
                     id: item.product.id
-                }, data:{
-                    quantity: {increment: item.quantity}
+                }, data: {
+                    quantity: { increment: item.quantity }
                 }
             })
         ))
 
         await prismaClient.order.update({
-            where:{
+            where: {
                 id: order.id
             },
-            data:{
+            data: {
                 status: "canceled"
-            }, include:{
-                order_items:{
-                    include:{
-                        product:true
+            }, include: {
+                order_items: {
+                    include: {
+                        product: true
                     }
                 }
             }
         })
 
         return {
-                id: order.id,
-                message: "Order are Canceled"
+            id: order.id,
+            message: "Order are Canceled"
         }
     }
 }
