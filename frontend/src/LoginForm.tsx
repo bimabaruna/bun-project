@@ -24,7 +24,7 @@ export default function LoginForm() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/users/login",
+        "/api/users/login",
         { username, password },
         { headers: { "Content-Type": "application/json" } }
       );
