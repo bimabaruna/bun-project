@@ -10,17 +10,15 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
     const size = pageSize;
 
     // Convert page number to skip value (0-indexed)
-    const calculateSkip = (pageNum: number) => (pageNum - 1) * size;
 
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem("token");
-                const skipValue = calculateSkip(pageNumber);
 
                 const response = await axios.get<ProductResponse>(
-                    `/api/products?page=${skipValue}&size=${size}`,
+                    `/api/products?page=${pageNumber}&size=${size}`,
                     {
                         headers: {
                             Authorization: token || "",

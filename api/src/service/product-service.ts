@@ -23,10 +23,21 @@ export class ProductService {
         return toProductResponse(product)
     }
 
-    static async getList(page: number, size: number): Promise<ProductListResponse> {
+    static async getList(page: number, size: number, product_name?: string): Promise<ProductListResponse> {
+
+        const pageNumber = Math.max(1, page)
+        const skip = (pageNumber - 1) * size
 
         const products = await prismaClient.product.findMany({
-            skip: page,
+            where: product_name
+                ? {
+                    name: {
+                        contains: product_name,
+                        mode: 'insensitive',
+                    },
+                }
+                : undefined,
+            skip: skip,
             take: size,
         })
 

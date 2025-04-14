@@ -4,6 +4,7 @@ import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
 import type { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
 import { ProductService } from "../service/product-service";
+import { date, number } from "zod";
 
 
 
@@ -26,8 +27,9 @@ productController.get('/api/products', async (c) => {
 
     const size = Number(c.req.query('size'))
     const page = Number(c.req.query('page'))
+    const product_name = c.req.query('productName')
 
-    const response = await ProductService.getList(page, size)
+    const response = await ProductService.getList(page, size, product_name)
     console.log(response);
     return c.json(response)
 })
@@ -53,7 +55,7 @@ productController.get('/api/products/:id', async (c) => {
     })
 })
 
-productController.delete('api/products/:id', async (c) => {
+productController.delete('/api/products/:id', async (c) => {
     const product_id = Number(c.req.param('id'))
     const response = await ProductService.delete(product_id)
 

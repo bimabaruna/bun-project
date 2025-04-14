@@ -32,7 +32,7 @@ export default function ProductList() {
 
                         onPrev={handlePrev}
                         onNext={handleNext}
-                        isFirstPage={pageNumber === 0}
+                        isFirstPage={pageNumber === 1}
                         hasMore={hasMore}
                     />
                 </>
