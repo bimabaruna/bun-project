@@ -10,9 +10,9 @@ import { date, number } from "zod";
 
 export const productController = new Hono<{ Variables: ApplicationVariables }>()
 
-productController.use(authMiddleware)
+// productController.use(authMiddleware)
 
-productController.post('/api/products', async (c) => {
+productController.post('/products', authMiddleware, async (c) => {
     const user = c.get('user') as User
     const request = await c.req.json() as CreateProductRequest
 
@@ -23,7 +23,7 @@ productController.post('/api/products', async (c) => {
     })
 })
 
-productController.get('/api/products', async (c) => {
+productController.get('/products', authMiddleware, async (c) => {
 
     const size = Number(c.req.query('size'))
     const page = Number(c.req.query('page'))
@@ -34,7 +34,7 @@ productController.get('/api/products', async (c) => {
     return c.json(response)
 })
 
-productController.patch('api/products/:id', async (c) => {
+productController.patch('/products/:id', authMiddleware, async (c) => {
 
     const user = c.get('user') as User
     const product_id = c.req.param('id')
@@ -46,7 +46,7 @@ productController.patch('api/products/:id', async (c) => {
     })
 })
 
-productController.get('/api/products/:id', async (c) => {
+productController.get('/products/:id', authMiddleware, async (c) => {
     const product_id = Number(c.req.param('id'))
     const response = await ProductService.get(product_id)
 
@@ -55,7 +55,7 @@ productController.get('/api/products/:id', async (c) => {
     })
 })
 
-productController.delete('/api/products/:id', async (c) => {
+productController.delete('/products/:id', authMiddleware, async (c) => {
     const product_id = Number(c.req.param('id'))
     const response = await ProductService.delete(product_id)
 

@@ -183,6 +183,7 @@ export class UserService {
         return {
             page: page,
             size: size,
+            lastPage: Math.ceil(totalCount/size),
             totalCount: totalCount,
             data: transformedUsers
         }

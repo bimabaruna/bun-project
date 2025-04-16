@@ -39,7 +39,8 @@ export function toProductResponse(product: Product): ProductResponse {
 export type ProductListResponse = {
     page: number,
     size: number,
-    totalCount: number
+    totalCount: number,
+    lastPage: number,
     products: ProductResponse[],
     
 }

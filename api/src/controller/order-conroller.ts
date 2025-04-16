@@ -10,9 +10,9 @@ import { OrderService } from "../service/order-service";
 
 export const orderController = new Hono<{ Variables: ApplicationVariables }>()
 
-orderController.use(authMiddleware)
+// orderController.use(authMiddleware)
 
-orderController.post('/api/order', async (c) =>{
+orderController.post('/order', authMiddleware, async (c) => {
     const user = c.get('user') as User
     const request = await c.req.json() as CreateOrderRequest
 
@@ -23,7 +23,7 @@ orderController.post('/api/order', async (c) =>{
     })
 })
 
-orderController.get('/api/order/:id', async (c) => {
+orderController.get('/order/:id', authMiddleware, async (c) => {
     const user = c.get('user') as User
     const request = c.req.param('id')
 
@@ -34,7 +34,7 @@ orderController.get('/api/order/:id', async (c) => {
     })
 })
 
-orderController.post('api/order/:id/cancel', async (c) => {
+orderController.post('/order/:id/cancel', authMiddleware, async (c) => {
 
     const user = c.get('user') as User
     const request = Number(c.req.param('id'))

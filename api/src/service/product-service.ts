@@ -34,7 +34,7 @@ export class ProductService {
                     contains: product_name,
                     mode: 'insensitive',
                 },
-            }: undefined,
+            } : undefined,
             skip: skip,
             take: size,
         }), prismaClient.product.count({
@@ -57,6 +57,7 @@ export class ProductService {
             page: page,
             size: size,
             totalCount,
+            lastPage: Math.ceil(totalCount / size),
             products: mapped
 
         }

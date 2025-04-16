@@ -11,7 +11,7 @@ import { authMiddleware } from "../middleware/auth-middleware";
 export const userController = new Hono<{ Variables: ApplicationVariables }>()
 
 
-userController.post('/api/users', async (c) => {
+userController.post('/users', async (c) => {
     const request = await c.req.json() as RegisterUserRequest;
 
     const response = await UserService.register(request)
@@ -21,7 +21,7 @@ userController.post('/api/users', async (c) => {
     })
 })
 
-userController.post('/api/users/login', async (c) => {
+userController.post('/users/login', async (c) => {
     const request = await c.req.json() as LoginUserRequest;
 
     const response = await UserService.login(request)
@@ -31,9 +31,9 @@ userController.post('/api/users/login', async (c) => {
     })
 })
 
-userController.use(authMiddleware)
+// userController.use(authMiddleware)
 
-userController.get('/api/users/user', async (c) => {
+userController.get('/users/user', authMiddleware, async (c) => {
 
     const user = c.get('user') as User
 
@@ -42,7 +42,7 @@ userController.get('/api/users/user', async (c) => {
     })
 })
 
-userController.get('/api/users', async (c) => {
+userController.get('/users', authMiddleware, async (c) => {
     const size = Number(c.req.query('size'))
     const page = Number(c.req.query('page'))
     const username = c.req.query('username')
@@ -52,7 +52,7 @@ userController.get('/api/users', async (c) => {
     return c.json(users);
 });
 
-userController.patch('/api/users/user', async (c) => {
+userController.patch('/users/user', authMiddleware, async (c) => {
     const user = c.get('user') as User
     const request = await c.req.json() as UpdateUserRequest
 
@@ -62,7 +62,7 @@ userController.patch('/api/users/user', async (c) => {
     })
 })
 
-userController.delete('/api/users/user', async (c) => {
+userController.delete('/users/user', authMiddleware, async (c) => {
     const user = c.get('user') as User
 
     const response = await UserService.logout(user)
@@ -71,8 +71,8 @@ userController.delete('/api/users/user', async (c) => {
     })
 })
 
-userController.delete('/api/users/', async (c) => {
-    const idParam = c.req.query('id'); // Grab the query parameter
+userController.delete('/users/', authMiddleware, async (c) => {
+    const idParam = c.req.query('id');
     const id = parseInt(idParam || '');
     const response = await UserService.deleteUser(id)
 

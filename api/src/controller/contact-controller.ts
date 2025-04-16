@@ -8,9 +8,9 @@ import type { CreateContactRequest, UpdateContactRequest } from "../model/contac
 
 export const contactController = new Hono<{ Variables: ApplicationVariables }>()
 
-contactController.use(authMiddleware)
+// contactController.use(authMiddleware)
 
-contactController.post('/api/contacts', async (c) => {
+contactController.post('/contacts', authMiddleware, async (c) => {
     const user = c.get('user') as User
 
     const request = await c.req.json() as CreateContactRequest
@@ -21,7 +21,7 @@ contactController.post('/api/contacts', async (c) => {
     })
 })
 
-contactController.get('/api/contacts/:id', async (c) => {
+contactController.get('/contacts/:id', authMiddleware, async (c) => {
     const user = c.get('user') as User
     const contactId = Number(c.req.param("id"))
 
@@ -32,7 +32,7 @@ contactController.get('/api/contacts/:id', async (c) => {
     })
 })
 
-contactController.patch('/api/contacts', async (c) => {
+contactController.patch('/contacts', authMiddleware, async (c) => {
     const user = c.get('user') as User
     const request = await c.req.json() as UpdateContactRequest
 
@@ -42,7 +42,7 @@ contactController.patch('/api/contacts', async (c) => {
     })
 })
 
-contactController.delete('/api/contacts/:id', async (c) => {
+contactController.delete('/contacts/:id', authMiddleware, async (c) => {
     // const user = c.get('user') as User
     const contactId = Number(c.req.param("id"))
     const response = await ContactService.delete(contactId)

@@ -7,9 +7,9 @@ import { PaymentService } from "../service/payment-service";
 
 export const paymentController = new Hono<{ Variables: ApplicationVariables }>()
 
-paymentController.use(authMiddleware)
+// paymentController.use(authMiddleware)
 
-paymentController.post('/api/payment', async(c) =>{
+paymentController.post('/payment', authMiddleware, async (c) => {
 
     const user = c.get('user') as User
     const request = await c.req.json() as PaymentRequest

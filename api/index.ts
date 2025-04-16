@@ -29,11 +29,11 @@ app.use('*', cors({
 //     return c.text('hello')
 // })
 
-app.route('/', userController)
-app.route('/', contactController)
-app.route('/', productController)
-app.route('/', orderController)
-app.route('/', paymentController)
+app.route('/api', userController)
+app.route('/api', contactController)
+app.route('/api', productController)
+app.route('/api', orderController)
+app.route('/api', paymentController)
 
 app.use('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
