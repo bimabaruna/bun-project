@@ -7,6 +7,7 @@ import type { User } from "@prisma/client";
 import { tokenToString } from "typescript";
 import { use } from "react";
 import { nan } from "zod";
+import { skip } from "@prisma/client/runtime/library";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'JWT_SECRET';
 const JWT_EXPIRES_IN = '1h';
@@ -43,7 +44,13 @@ export class UserService {
 
     static async login(request: LoginUserRequest): Promise<UserResponse> {
 
-        request = UserValidation.LOGIN.parse(request)
+
+        const result = UserValidation.LOGIN.safeParse(request)
+
+        if (!result.success) {
+            const messages = result.error.errors.map(e => e.message);
+            throw new Error(messages.join(", "));
+        }
 
         let user = await prismaClient.user.findUnique({
             where: {
@@ -66,9 +73,9 @@ export class UserService {
         }
 
         const token = await sign(
-            { id: user.id, username: user.username }, 
+            { id: user.id, username: user.username },
             JWT_SECRET
-          )
+        )
 
         user = await prismaClient.user.update({
             where: {
@@ -143,11 +150,28 @@ export class UserService {
 
     }
 
-    static async getList(): Promise<UserListResponse> {
+    static async getList(page: number, size: number, username?: string): Promise<UserListResponse> {
 
-
-        const userList = await prismaClient.user.findMany({
+        const pageNumber = Math.max(1, page)
+        const skip = (pageNumber - 1) * size
+        const [userList, totalCount] = await Promise.all([prismaClient.user.findMany({
+            where: username ? {
+                username: {
+                    contains: username,
+                    mode: 'insensitive',
+                },
+            } : undefined,
+            skip: skip,
+            take: size
+        }), prismaClient.user.count({
+            where: username ? {
+                username: {
+                    contains: username,
+                    mode: 'insensitive',
+                },
+            } : undefined
         })
+        ])
 
         const transformedUsers = userList.map(user => ({
             id: user.id,
@@ -155,7 +179,11 @@ export class UserService {
             name: user.name
         }))
 
+
         return {
+            page: page,
+            size: size,
+            totalCount: totalCount,
             data: transformedUsers
         }
     }

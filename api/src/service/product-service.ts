@@ -28,18 +28,24 @@ export class ProductService {
         const pageNumber = Math.max(1, page)
         const skip = (pageNumber - 1) * size
 
-        const products = await prismaClient.product.findMany({
-            where: product_name
-                ? {
-                    name: {
-                        contains: product_name,
-                        mode: 'insensitive',
-                    },
-                }
-                : undefined,
+        const [products, totalCount] = await Promise.all([prismaClient.product.findMany({
+            where: product_name ? {
+                name: {
+                    contains: product_name,
+                    mode: 'insensitive',
+                },
+            }: undefined,
             skip: skip,
             take: size,
+        }), prismaClient.product.count({
+            where: product_name ? {
+                name: {
+                    contains: product_name,
+                    mode: 'insensitive'
+                },
+            } : undefined
         })
+        ])
 
         const mapped = products.map(product => ({
             id: product.id,
@@ -50,6 +56,7 @@ export class ProductService {
         return {
             page: page,
             size: size,
+            totalCount,
             products: mapped
 
         }

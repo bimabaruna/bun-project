@@ -20,14 +20,14 @@ dotenv.config({
 console.log("Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
 app.use('*', cors({
-    origin: "http://localhost:5173",
+    origin: "*",
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
 }))
 
-app.get('/', (c) => {
-    return c.text('hello')
-})
+// app.get('/', (c) => {
+//     return c.text('hello')
+// })
 
 app.route('/', userController)
 app.route('/', contactController)
@@ -35,8 +35,8 @@ app.route('/', productController)
 app.route('/', orderController)
 app.route('/', paymentController)
 
-// app.use('*', serveStatic({ root: './frontend/dist' }));
-// app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
+app.use('*', serveStatic({ root: './frontend/dist' }));
+app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
 
 app.onError(async (err, c) => {
     if (err instanceof HTTPException) {

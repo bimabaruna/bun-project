@@ -43,7 +43,11 @@ userController.get('/api/users/user', async (c) => {
 })
 
 userController.get('/api/users', async (c) => {
-    const users = await UserService.getList()
+    const size = Number(c.req.query('size'))
+    const page = Number(c.req.query('page'))
+    const username = c.req.query('username')
+
+    const users = await UserService.getList(page, size, username)
 
     return c.json(users);
 });

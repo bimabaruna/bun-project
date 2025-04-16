@@ -33,5 +33,8 @@ export function toUserResponse(user: User): UserResponse {
 }
 
 export type UserListResponse = {
+    page: number,
+    size: number,
+    totalCount: number
     data: UserResponse[]
 }
