@@ -1,5 +1,5 @@
 import type { password } from "bun";
-import { z, ZodType } from "zod";
+import { number, z, ZodType } from "zod";
 
 
 
@@ -24,4 +24,8 @@ export class UserValidation {
     static readonly TOKEN: ZodType = z.string().min(1)
 
     static readonly USER_LIST: ZodType = z.string().min(1)
+
+    static readonly GET: ZodType = z.number().min(1)
+
+    static readonly UPDATEBYID: ZodType = number().min(1)
 }

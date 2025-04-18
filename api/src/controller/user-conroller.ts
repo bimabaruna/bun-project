@@ -80,3 +80,26 @@ userController.delete('/users/', authMiddleware, async (c) => {
         data: response
     })
 })
+
+userController.get('/users/:id', authMiddleware, async (c) => {
+    const idParam = c.req.param('id');
+    const id = parseInt(idParam || '');
+    const response = await UserService.getById(id)
+
+    return c.json({
+        data: response
+    })
+})
+
+userController.patch('/users/:id', authMiddleware, async (c) => {
+    const idParam = c.req.param('id');
+    const id = parseInt(idParam || '');
+    const request = await c.req.json() as UpdateUserRequest
+
+    const response = await UserService.updateById(id, request)
+
+    return c.json({
+        data: response
+
+    })
+})

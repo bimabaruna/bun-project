@@ -8,6 +8,7 @@ import { tokenToString } from "typescript";
 import { use } from "react";
 import { nan } from "zod";
 import { skip } from "@prisma/client/runtime/library";
+import { password } from "bun";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'JWT_SECRET';
 const JWT_EXPIRES_IN = '1h';
@@ -206,5 +207,58 @@ export class UserService {
         })
 
         return true
+    }
+
+    static async getById( id: number): Promise<UserResponse>{
+
+        id = UserValidation.GET.parse(id)
+
+        const user = await prismaClient.user.findUnique({
+            where: {
+                id: id
+            }
+        })
+
+        if (!user) {
+            throw new HTTPException(401, {
+                message: 'Unathorized'
+            })
+        }
+
+        return {
+            id: user.id,
+            username: user.username,
+            name: user.name
+            
+        }
+    }
+
+    static async updateById (id : number, request: UpdateUserRequest): Promise<UserResponse>{
+
+        id = UserValidation.UPDATEBYID.parse(id)
+        request = UserValidation.UPDATE.parse(request)
+
+        let user = await prismaClient.user.findFirst({
+            where: {
+                id: id
+            }
+        })
+
+        if(!user){
+            throw new HTTPException(400, {
+                message: 'User not found'
+            })
+        }
+
+        user = await prismaClient.user.update({
+            where: {
+                id: id
+            }, data: {
+                name: request.name,
+                password: request.password
+            }
+        })
+
+        return toUserResponse(user)
     }
 }
