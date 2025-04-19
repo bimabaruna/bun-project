@@ -3,7 +3,7 @@ import { prismaClient } from "../application/database";
 import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UpdateUserRequest, type UserListResponse, type UserResponse } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { sign, verify } from "hono/jwt";
-import type { User } from "@prisma/client";
+import type { Role, User } from "@prisma/client";
 import { tokenToString } from "typescript";
 import { use } from "react";
 import { nan } from "zod";
@@ -17,7 +17,12 @@ export class UserService {
 
     static async register(request: RegisterUserRequest): Promise<UserResponse> {
 
-        request = UserValidation.REGISTER.parse(request)
+        const result = UserValidation.REGISTER.safeParse(request)
+
+        if (!result.success) {
+            const messages = result.error.errors.map(e => e.message);
+            throw new Error(messages.join(", "));
+        }
 
         const totalUserWithSameUsername = await prismaClient.user.count({
             where: {
@@ -37,10 +42,17 @@ export class UserService {
         })
 
         const user = await prismaClient.user.create({
-            data: request
+            data: {
+                username: request.username,
+                name: request.name,
+                password: request.password,
+                role_id: request.roleId
+            }, include: {
+                role: true
+            }
         })
 
-        return toUserResponse(user)
+        return toUserResponse(user, user.role)
     }
 
     static async login(request: LoginUserRequest): Promise<UserResponse> {
@@ -78,21 +90,24 @@ export class UserService {
             JWT_SECRET
         )
 
-        user = await prismaClient.user.update({
+        const userLogin = await prismaClient.user.update({
             where: {
                 username: request.username
             },
             data: {
                 token: token
+            }, include: {
+                role: true
             }
         })
 
-        const response = toUserResponse(user)
+        const response = toUserResponse(user, userLogin.role)
 
         response.token = user.token!;
         return response
     }
 
+    // get user token fir nuddkeware
     static async get(token: string | undefined | null): Promise<User> {
 
         token = UserValidation.TOKEN.parse(token)
@@ -113,7 +128,12 @@ export class UserService {
     }
 
     static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
-        request = UserValidation.UPDATE.parse(request)
+        const result = UserValidation.UPDATE.safeParse(request)
+
+        if (!result.success) {
+            const messages = result.error.errors.map(e => e.message);
+            throw new Error(messages.join(", "));
+        }
 
         if (request.name) {
             user.name = request.name
@@ -126,14 +146,21 @@ export class UserService {
             })
         }
 
-        user = await prismaClient.user.update({
+        if (typeof request.roleId !== 'undefined') {
+            user.role_id = request.roleId
+        }
+
+        const updatedUser = await prismaClient.user.update({
             where: {
-                username: user.username
+                id: user.id
             },
-            data: user
+            data: user,
+            include: {
+                role: true
+            }
         })
 
-        return toUserResponse(user)
+        return toUserResponse(user, updatedUser.role)
     }
 
     static async logout(user: User): Promise<boolean> {
@@ -162,6 +189,9 @@ export class UserService {
                     mode: 'insensitive',
                 },
             } : undefined,
+            include: {
+                role: true
+            },
             skip: skip,
             take: size
         }), prismaClient.user.count({
@@ -177,14 +207,17 @@ export class UserService {
         const transformedUsers = userList.map(user => ({
             id: user.id,
             username: user.username,
-            name: user.name
+            name: user.name,
+            roleId: user.role_id ?? null,
+            roleName: user.role?.role_name ?? null
+
         }))
 
 
         return {
             page: page,
             size: size,
-            lastPage: Math.ceil(totalCount/size),
+            lastPage: Math.ceil(totalCount / size),
             totalCount: totalCount,
             data: transformedUsers
         }
@@ -209,34 +242,36 @@ export class UserService {
         return true
     }
 
-    static async getById( id: number): Promise<UserResponse>{
+    static async getById(id: number): Promise<UserResponse> {
 
         id = UserValidation.GET.parse(id)
 
         const user = await prismaClient.user.findUnique({
             where: {
                 id: id
+            }, include: {
+                role: true
             }
         })
 
         if (!user) {
-            throw new HTTPException(401, {
-                message: 'Unathorized'
+            throw new HTTPException(400, {
+                message: 'User not found'
             })
         }
 
-        return {
-            id: user.id,
-            username: user.username,
-            name: user.name
-            
-        }
+        return toUserResponse(user, user.role)
     }
 
-    static async updateById (id : number, request: UpdateUserRequest): Promise<UserResponse>{
+    static async updateById(id: number, request: UpdateUserRequest): Promise<UserResponse> {
 
         id = UserValidation.UPDATEBYID.parse(id)
-        request = UserValidation.UPDATE.parse(request)
+        const req = UserValidation.UPDATE.safeParse(request)
+
+        if (!req.success) {
+            const messages = req.error.errors.map(e => e.message);
+            throw new Error(messages.join(", "));
+        }
 
         let user = await prismaClient.user.findFirst({
             where: {
@@ -244,7 +279,7 @@ export class UserService {
             }
         })
 
-        if(!user){
+        if (!user) {
             throw new HTTPException(400, {
                 message: 'User not found'
             })
@@ -255,7 +290,8 @@ export class UserService {
                 id: id
             }, data: {
                 name: request.name,
-                password: request.password
+                password: request.password,
+                role_id: request.roleId
             }
         })
 

@@ -9,6 +9,7 @@ import { paymentController } from "./src/controller/payment-controller";
 import { serveStatic } from "hono/bun";
 import dotenv from "dotenv";
 import { cors } from "hono/cors";
+import { roleController } from "./src/controller/role-controller";
 
 const app = new Hono()
 
@@ -34,6 +35,7 @@ app.route('/api', contactController)
 app.route('/api', productController)
 app.route('/api', orderController)
 app.route('/api', paymentController)
+app.route('/api', roleController)
 
 app.use('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }))

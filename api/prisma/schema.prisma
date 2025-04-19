@@ -18,10 +18,12 @@ model User {
   username String  @unique
   password String
   name     String
+  role_id  Int?
   token    String?
 
   contacts Contact[]
   orders   Order[]
+  role     Role?   @relation(fields: [role_id], references: [id])
 
   @@map("users")
 }
@@ -75,8 +77,8 @@ model Order {
   id          Int      @id @default(autoincrement())
   customer_id Int
   order_date  DateTime @default(now())
-  total_price Decimal @db.Decimal(10, 2)
-  status      String  @default("on_progress")
+  total_price Decimal  @db.Decimal(10, 2)
+  status      String   @default("on_progress")
 
   order_items OrderItem[]
   payments    Payment[]
@@ -103,11 +105,20 @@ model Payment {
   id           Int      @id @default(autoincrement())
   order_id     Int
   payment_date DateTime @default(now())
-  amount       Decimal @db.Decimal(10, 2)
+  amount       Decimal  @db.Decimal(10, 2)
   status       String   @default("paid")
 
   method String
   order  Order  @relation(fields: [order_id], references: [id])
 
   @@map("payments")
+}
+
+model Role {
+  id        Int    @id @default(autoincrement())
+  role_name String
+
+  users     User[] 
+
+  @@map("role")
 }
