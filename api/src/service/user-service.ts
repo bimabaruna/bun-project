@@ -2,13 +2,8 @@ import { HTTPException } from "hono/http-exception";
 import { prismaClient } from "../application/database";
 import { toUserResponse, type LoginUserRequest, type RegisterUserRequest, type UpdateUserRequest, type UserListResponse, type UserResponse } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
-import { sign, verify } from "hono/jwt";
+import { sign } from "hono/jwt";
 import type { Role, User } from "@prisma/client";
-import { tokenToString } from "typescript";
-import { use } from "react";
-import { nan } from "zod";
-import { skip } from "@prisma/client/runtime/library";
-import { password } from "bun";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'JWT_SECRET';
 const JWT_EXPIRES_IN = '1h';

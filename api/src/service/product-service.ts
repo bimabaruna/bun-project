@@ -2,15 +2,19 @@ import { toProductResponse, type CreateProductRequest, type ProductListResponse,
 import type { User } from '@prisma/client';
 import { productValidation } from "../validation/product-validation";
 import { prismaClient } from "../application/database";
-import { use } from "react";
-import { date } from "zod";
 import { HTTPException } from "hono/http-exception";
 
 export class ProductService {
 
     static async create(user: User, request: CreateProductRequest): Promise<ProductResponse> {
 
-        request = productValidation.CREATE.parse(request)
+        const result = productValidation.CREATE.safeParse(request)
+
+        if (!result.success) {
+            const messages = result.error.errors.map(e => e.message);
+            throw new Error(messages.join(", "));
+        }
+
 
         const product = await prismaClient.product.create({
             data: {
@@ -47,25 +51,24 @@ export class ProductService {
         })
         ])
 
-        const mapped = products.map(product => ({
-            id: product.id,
-            name: product.name,
-            quantity: product.quantity,
-            price: Number(product.price)
-        }))
+        const mapped = products.map(toProductResponse);
         return {
             page: page,
             size: size,
             totalCount,
             lastPage: Math.ceil(totalCount / size),
             products: mapped
-
         }
     }
 
     static async update(product_id: string, request: UpdateProductRequest, user: User): Promise<ProductResponse> {
 
-        request = productValidation.UPDATE.parse(request)
+        const result = productValidation.UPDATE.safeParse(request)
+
+        if (!result.success) {
+            const messages = result.error.errors.map(e => e.message);
+            throw new Error(messages.join(", "));
+        }
 
         const date = new Date().toISOString();
 

@@ -13,8 +13,8 @@ export type ProductResponse = {
     quantity: number;
     created_at?: Date;
     created_by?: string;
-    updated_at?: Date;
-    updated_by?: string;
+    updated_at?: Date | null;
+    updated_by?: string | null;
 }
 
 export type UpdateProductRequest = {
@@ -31,8 +31,8 @@ export function toProductResponse(product: Product): ProductResponse {
         quantity: product.quantity,
         created_at: product.created_at,
         created_by: product.created_by,
-        updated_at: product.updated_at ?? undefined,
-        updated_by: product.updated_by ?? undefined
+        updated_at: product.updated_at ?? null,
+        updated_by: product.updated_by ?? null
     }
 }
 

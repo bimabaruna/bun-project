@@ -1,14 +1,9 @@
-import { toProductResponse, type CreateProductRequest, type ProductListResponse, type ProductResponse, type UpdateProductRequest } from "../model/product-model";
 import type { User } from '@prisma/client';
-import { productValidation } from "../validation/product-validation";
 import { prismaClient } from "../application/database";
-import { use } from "react";
-import { date, number, promise } from "zod";
 import { HTTPException } from "hono/http-exception";
 import { toOrderResponse, type CreateOrderRequest, type OrderResponse } from "../model/order-model";
 import type { Decimal } from "@prisma/client/runtime/library";
 import { orderValidation } from "../validation/order-validation";
-import { userController } from "../controller/user-conroller";
 
 export class OrderService {
 
