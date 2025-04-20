@@ -1,5 +1,5 @@
 import { toProductResponse, type CreateProductRequest, type ProductListResponse, type ProductResponse, type UpdateProductRequest } from "../model/product-model";
-import type { User } from '@prisma/client';
+import type { User, ProductCategory } from '@prisma/client';
 import { productValidation } from "../validation/product-validation";
 import { prismaClient } from "../application/database";
 import { HTTPException } from "hono/http-exception";
@@ -21,10 +21,13 @@ export class ProductService {
                 name: request.name,
                 price: request.price,
                 quantity: request.quantity,
-                created_by: user.username
+                created_by: user.username,
+                category_id: request.categoryId
+            }, include: {
+                product_category: true
             }
         })
-        return toProductResponse(product)
+        return toProductResponse(product, product.product_category)
     }
 
     static async getList(page: number, size: number, product_name?: string): Promise<ProductListResponse> {
@@ -39,6 +42,9 @@ export class ProductService {
                     mode: 'insensitive',
                 },
             } : undefined,
+            include: {
+                product_category: true
+            },
             skip: skip,
             take: size,
         }), prismaClient.product.count({
@@ -51,7 +57,9 @@ export class ProductService {
         })
         ])
 
-        const mapped = products.map(toProductResponse);
+        const mapped = products.map((product) =>
+            toProductResponse(product, product.product_category)
+        );
         return {
             page: page,
             size: size,
@@ -81,11 +89,14 @@ export class ProductService {
                 price: request.price,
                 quantity: request.quantity,
                 updated_at: date.toString(),
-                updated_by: user.username
+                updated_by: user.username,
+                category_id: request.categoryId
+            }, include: {
+                product_category: true
             }
         })
 
-        return toProductResponse(product)
+        return toProductResponse(product, product.product_category)
 
     }
 
@@ -95,6 +106,8 @@ export class ProductService {
         const product = await prismaClient.product.findFirst({
             where: {
                 id: product_id
+            }, include: {
+                product_category: true
             }
         })
 
@@ -102,10 +115,10 @@ export class ProductService {
             throw new Error('Product not found')
         }
 
-        return toProductResponse(product)
+        return toProductResponse(product, product.product_category)
     }
 
-    static async delete(product_id: number): Promise<ProductResponse> {
+    static async delete(product_id: number): Promise<{}> {
 
         product_id = productValidation.DELETE.parse(product_id)
 
@@ -124,9 +137,13 @@ export class ProductService {
         const product = await prismaClient.product.delete({
             where: {
                 id: product_id
+            }, include: {
+                product_category: true
             }
         })
 
-        return toProductResponse(product)
+        return {
+            message: 'Successfully deleted the product.'
+        }
     }
 }

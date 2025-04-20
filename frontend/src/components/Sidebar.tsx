@@ -1,15 +1,11 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
-import { FaBars, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Import icons
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Import icons
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false); // New state for collapsed state
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);

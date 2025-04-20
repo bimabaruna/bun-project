@@ -1,9 +1,10 @@
-import type { Product } from "@prisma/client";
+import type { Product, ProductCategory } from "@prisma/client";
 
 export type CreateProductRequest = {
     name: string;
     price: number;
     quantity: number;
+    categoryId?: number ;
 }
 
 export type ProductResponse = {
@@ -11,28 +12,33 @@ export type ProductResponse = {
     name: string;
     price: number;
     quantity: number;
-    created_at?: Date;
-    created_by?: string;
-    updated_at?: Date | null;
-    updated_by?: string | null;
+    createdAt?: Date;
+    createdBy?: string;
+    updatedAt?: Date | null;
+    updatedBy?: string | null;
+    categoryId?: number | null;
+    categoryName?: string | null;
 }
 
 export type UpdateProductRequest = {
     name: string;
     price: number;
     quantity: number;
+    categoryId?: number;
 }
 
-export function toProductResponse(product: Product): ProductResponse {
+export function toProductResponse(product: Product, category?: ProductCategory | null): ProductResponse {
     return {
         id: product.id,
         name: product.name,
         price: Number(product.price),
         quantity: product.quantity,
-        created_at: product.created_at,
-        created_by: product.created_by,
-        updated_at: product.updated_at ?? null,
-        updated_by: product.updated_by ?? null
+        createdAt: product.created_at,
+        createdBy: product.created_by,
+        updatedAt: product.updated_at ?? null,
+        updatedBy: product.updated_by ?? null,
+        categoryId: product.category_id ?? null,
+        categoryName: category?.category_name ?? null
     }
 }
 
