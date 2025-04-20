@@ -218,7 +218,7 @@ export class UserService {
         }
     }
 
-    static async deleteUser(id: number): Promise<boolean> {
+    static async deleteUser(id: number, user: User): Promise<boolean> {
 
         const userExist = await prismaClient.user.count({
             where: {
@@ -226,8 +226,19 @@ export class UserService {
             }
         })
         if (!userExist) {
-            return false
+            throw new HTTPException(400, {message: 'User not found'})
         }
+
+        const UserSelf = await prismaClient.user.count({
+            where :{
+                id: user.id
+            }
+        })
+
+        if(UserSelf){
+            throw new HTTPException(400, {message: 'Cannot delete yourself'})
+        }
+        
         await prismaClient.user.delete({
             where: {
                 id: id

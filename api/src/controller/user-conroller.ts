@@ -74,7 +74,8 @@ userController.delete('/users/user', authMiddleware, async (c) => {
 userController.delete('/users', authMiddleware, async (c) => {
     const idParam = c.req.query('id');
     const id = parseInt(idParam || '');
-    const response = await UserService.deleteUser(id)
+    const user = c.get('user') as User
+    const response = await UserService.deleteUser(id, user)
 
     return c.json({
         data: response
