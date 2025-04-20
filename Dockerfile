@@ -32,7 +32,7 @@ RUN bunx prisma generate
 COPY api ./api
 
 # Copy built frontend (already built locally before deploy)
-COPY frontend/dist ./dist
+COPY frontend/dist ./frontend/dist
 
 
 # -------- Final Runtime Image --------

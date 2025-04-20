@@ -13,6 +13,7 @@
     "allowJs": true, // Izinkan file JS/JSX
     "noImplicitAny": false, // Agar tidak error pada `any` yang tidak ditentukan
     "baseUrl": "../.",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "paths": {
       "@/*": ["./src/*"]
     }
