@@ -5,6 +5,7 @@ import { authMiddleware } from "../middleware/auth-middleware";
 import type { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
 import { ProductService } from "../service/product-service";
 import { date, number } from "zod";
+import { productValidation } from "../validation/product-validation";
 
 
 
@@ -62,4 +63,69 @@ productController.delete('/products/:id', authMiddleware, async (c) => {
     return c.json(
         response
     )
+})
+
+productController.post('/v2/products', authMiddleware, async (c)=>{
+    const user = c.get('user') as User;
+    
+    try {
+       
+        const formData = await c.req.formData();
+
+        const image = formData.get('image');
+        let imageFile: File | null = null;
+        if (image instanceof File) {
+            imageFile = image as unknown as File;
+            console.log(`Received image file: ${image.name}, type: ${image.type}, size: ${image.size}`);
+        } else if (image) {
+            console.warn("Received 'image' field, but it was not a standard File object.");
+        }
+
+        const dataString = formData.get('data'); 
+        if (!dataString || typeof dataString !== 'string') {
+            c.status(400);
+            return c.json({ error: "Missing or invalid 'data' field. Expected a JSON string." });
+        }
+
+        let productDataJson: any;
+        try {
+            productDataJson = JSON.parse(dataString);
+        } catch (error) {
+            c.status(400);
+            return c.json({ error: "Invalid JSON format in 'data' field." });
+        }
+
+        const validationResult = productValidation.CREATE.safeParse(productDataJson);
+        if (!validationResult.success) {
+            const messages = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+            c.status(400);
+            return c.json({ error: "Validation failed for data field", details: messages });
+        }
+        const validatedData = validationResult.data; 
+        const { File: FormDataNodeFile } = await import('formdata-node');
+        const convertedImageFile = imageFile ? new FormDataNodeFile([imageFile], imageFile.name, { type: imageFile.type }) : null;
+        const response = await ProductService.createV2(user, validatedData, convertedImageFile);
+
+        return c.json({
+            data: response
+        });
+
+    } catch (error: any) {
+        console.error("Error in POST /products:", error);
+        
+        if (error.message?.includes("Upload failed") || error.message?.includes("Storage service not available")) {
+             c.status(500); // Or 400 Bad Request if file format was wrong?
+             return c.json({ error: "Image processing failed.", detail: error.message });
+        }
+        if (error.message?.includes("Failed to save product")) {
+             c.status(500);
+             return c.json({ error: "Database operation failed.", detail: error.message });
+        }
+
+        // Generic fallback error
+        c.status(500);
+        return c.json({
+            error: "An unexpected error occurred while creating the product.",
+        });
+    }
 })

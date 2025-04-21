@@ -16,10 +16,14 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.16.0",
     "@prisma/client": "^6.5.0",
+    "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.9",
     "dotenv": "^16.5.0",
-    "hono": "^4.7.5",
+    "formdata-node": "^6.0.3",
+    "formidable": "^3.5.3",
+    "hono": "^4.7.7",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",
     "react": "^19.0.0",

@@ -229,13 +229,7 @@ export class UserService {
             throw new HTTPException(400, {message: 'User not found'})
         }
 
-        const UserSelf = await prismaClient.user.count({
-            where :{
-                id: user.id
-            }
-        })
-
-        if(UserSelf){
+        if(id === user.id){
             throw new HTTPException(400, {message: 'Cannot delete yourself'})
         }
         

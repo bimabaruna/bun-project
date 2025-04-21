@@ -5,6 +5,7 @@ export type CreateProductRequest = {
     price: number;
     quantity: number;
     categoryId?: number ;
+    imageUrl?: string;
 }
 
 export type ProductResponse = {
@@ -16,6 +17,7 @@ export type ProductResponse = {
     createdBy?: string;
     updatedAt?: Date | null;
     updatedBy?: string | null;
+    imageUrl?: string | null;
     categoryId?: number | null;
     categoryName?: string | null;
 }
@@ -38,6 +40,7 @@ export function toProductResponse(product: Product, category?: ProductCategory |
         updatedAt: product.updated_at ?? null,
         updatedBy: product.updated_by ?? null,
         categoryId: product.category_id ?? null,
+        imageUrl: product.image_url ?? null,
         categoryName: category?.category_name ?? null
     }
 }

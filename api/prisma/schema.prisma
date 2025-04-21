@@ -68,6 +68,7 @@ model Product {
   updated_at DateTime? @updatedAt
   updated_by String?
   category_id Int?
+  image_url String?
 
 
   order_items OrderItem[]

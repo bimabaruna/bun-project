@@ -1,8 +1,21 @@
 import { toProductResponse, type CreateProductRequest, type ProductListResponse, type ProductResponse, type UpdateProductRequest } from "../model/product-model";
 import type { User, ProductCategory } from '@prisma/client';
-import { productValidation } from "../validation/product-validation";
+import { productValidation, type ValidatedProductData } from "../validation/product-validation";
 import { prismaClient } from "../application/database";
 import { HTTPException } from "hono/http-exception";
+import { Storage } from '@google-cloud/storage'
+import { Readable } from 'stream'
+import { File } from 'formdata-node'
+import { bucket, bucketName } from '../utils/gcs'
+import path from 'path'
+
+
+// const keyPath = path.resolve(import.meta.dir, '../gcs-service-account.json')
+// console.log('Resolved Key Path:', keyPath)
+// const storage = new Storage({
+//   keyFilename: keyPath,
+// })
+// const bucket = storage.bucket(bucketName)
 
 export class ProductService {
 
@@ -144,6 +157,87 @@ export class ProductService {
 
         return {
             message: 'Successfully deleted the product.'
+        }
+    }
+
+    private static async _uploadImageToGCS(file: File): Promise<string> {
+        if (!bucket) {
+             console.error("GCS Bucket is not initialized. Cannot upload file.");
+             throw new Error("Storage service not available.");
+        }
+
+        const ext = file.name.split('.').pop() || 'bin'; 
+        const filename = `products/${Date.now()}.${ext}`;
+        const gcsFile = bucket.file(filename);
+
+        console.log(`Attempting to upload ${file.name} as ${filename} to bucket ${bucketName}`);
+
+        const stream = gcsFile.createWriteStream({
+            metadata: {
+                contentType: file.type || 'application/octet-stream', 
+            },
+            // public: true,
+            resumable: false, // Consider false for smaller files if needed
+        });
+
+        return new Promise((resolve, reject) => {
+            stream.on('error', (err) => {
+                console.error(`GCS Upload Stream Error for ${filename}:`, err);
+                reject(new Error(`Upload failed for file ${file.name}`));
+            });
+
+            stream.on('finish', () => {
+                const publicUrl = `https://storage.googleapis.com/${bucketName}/${filename}`;
+                console.log(`GCS Upload Finished for ${filename}. Public URL: ${publicUrl}`);
+                resolve(publicUrl);
+            });
+
+    
+            try {
+                const readable = Readable.fromWeb(file.stream() as any); 
+                readable.pipe(stream);
+            } catch (pipeError) {
+                console.error(`Error piping file stream for ${filename}:`, pipeError);
+                reject(new Error(`Failed to read file stream for ${file.name}`));
+            }
+        });
+    }
+
+    static async createV2(
+        user: User,
+        data: ValidatedProductData, // Use validated data type from Zod
+        imageFile: File | null
+    ): Promise<ProductResponse> {
+
+        let imageUrl: string | null = null;
+        if (imageFile) {
+            try {
+                imageUrl = await ProductService._uploadImageToGCS(imageFile);
+            } catch (uploadError) {
+                console.error("Product creation failed due to image upload error:", uploadError);
+                throw new Error("Image upload failed, product not created.");
+            }
+        }
+        try {
+            const product = await prismaClient.product.create({
+                data: {
+                    name: data.name,
+                    price: data.price,       
+                    quantity: data.quantity,
+                    created_by: user.username,
+                    category_id: data.categoryId,
+                    image_url: imageUrl 
+                },
+                include: {
+                    product_category: true 
+                }
+            });
+
+            return toProductResponse(product, product.product_category);
+
+        } catch(dbError) {
+             console.error("Database error during product creation:", dbError);
+             throw new Error("Failed to save product to database.");
         }
     }
 }
