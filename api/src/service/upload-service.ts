@@ -4,6 +4,7 @@ import { File } from 'formdata-node'
 import { bucketName } from '../utils/gcs'
 
 import path from 'path'
+import { date } from 'zod'
 
 const keyPath = path.resolve(import.meta.dir, '../gcs-service-account.json')
 console.log('Resolved Key Path:', keyPath)
@@ -15,7 +16,9 @@ const bucket = storage.bucket(bucketName)
 export class UploadService {
   static async uploadFile(file: File): Promise<string> {
     const ext = file.name.split('.').pop()
-    const filename = `products/${Date.now()}.${ext}`
+    const date = new Date()
+    const dateNow = date.toISOString().replace(/:/g, '-').replace(/\..+/, '')
+    const filename = `products/${dateNow}.${ext}`
     const gcsFile = bucket.file(filename)
 
     const stream = gcsFile.createWriteStream({

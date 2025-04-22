@@ -4,7 +4,6 @@ import type { User } from "@prisma/client";
 import { authMiddleware } from "../middleware/auth-middleware";
 import type { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
 import { ProductService } from "../service/product-service";
-import { date, number } from "zod";
 import { productValidation } from "../validation/product-validation";
 
 

@@ -22,8 +22,7 @@ uploadController.post('/upload-url', authMiddleware, async (c) => {
             return c.json({ error: 'Invalid file format' }, 400)
         }
 
-        // Proceed with the file upload
-        // Convert browser File to formdata-node File
+
         const { File: FormDataNodeFile } = await import('formdata-node')
         const convertedFile = new FormDataNodeFile([file], file.name, { type: file.type })
         const imageUrl = await UploadService.uploadFile(convertedFile)

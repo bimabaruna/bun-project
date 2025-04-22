@@ -27,6 +27,7 @@ export type UpdateProductRequest = {
     price: number;
     quantity: number;
     categoryId?: number;
+    imageUrl?: string;
 }
 
 export function toProductResponse(product: Product, category?: ProductCategory | null): ProductResponse {
@@ -50,6 +51,6 @@ export type ProductListResponse = {
     size: number,
     totalCount: number,
     lastPage: number,
-    products: ProductResponse[],
+    data: ProductResponse[],
     
 }

@@ -26,7 +26,8 @@ export class ProductService {
                 price: request.price,
                 quantity: request.quantity,
                 created_by: user.username,
-                category_id: request.categoryId
+                category_id: request.categoryId,
+                image_url: request.imageUrl
             }, include: {
                 product_category: true
             }
@@ -69,7 +70,7 @@ export class ProductService {
             size: size,
             totalCount,
             lastPage: Math.ceil(totalCount / size),
-            products: mapped
+            data: mapped
         }
     }
 
@@ -84,6 +85,32 @@ export class ProductService {
 
         const date = new Date().toISOString();
 
+        const imageUrl = await prismaClient.product.findFirst({
+            where: { id: Number(product_id) }
+        })
+
+        if (imageUrl?.image_url) {
+            const fileName = imageUrl.image_url.split("/").pop();
+            const file = bucket.file(`products/${fileName}`);
+            await file.exists().then(async (exists) => {
+                if (exists[0]) {
+                    await file.delete().catch((error) => {
+                        console.error("Error deleting file from GCS:", error);
+                        throw new HTTPException(500, {
+                            message: "Failed to delete image from storage."
+                        });
+                    });
+                }
+            }).catch((error) => {
+                console.error("Error checking file existence:", error);
+                throw new HTTPException(500, {
+                    message: "Failed to check image existence in storage."
+                });
+            })
+
+        }
+
+
         const product = await prismaClient.product.update({
             where: {
                 id: Number(product_id)
@@ -94,7 +121,8 @@ export class ProductService {
                 quantity: request.quantity,
                 updated_at: date.toString(),
                 updated_by: user.username,
-                category_id: request.categoryId
+                category_id: request.categoryId,
+                image_url: request.imageUrl
             }, include: {
                 product_category: true
             }
@@ -138,7 +166,28 @@ export class ProductService {
             })
         }
 
-        const product = await prismaClient.product.delete({
+        if (getProduct.image_url) {
+            const fileName = getProduct.image_url.split("/").pop();
+            const file = bucket.file(`products/${fileName}`);
+            await file.exists().then(async (exists) => {
+                if (exists[0]) {
+                    await file.delete().catch((error) => {
+                        console.error("Error deleting file from GCS:", error);
+                        throw new HTTPException(500, {
+                            message: "Failed to delete image from storage."
+                        });
+                    });
+                }
+            }).catch((error) => {
+                console.error("Error checking file existence:", error);
+                throw new HTTPException(500, {
+                    message: "Failed to check image existence in storage."
+                });
+            })
+
+        }
+
+        await prismaClient.product.delete({
             where: {
                 id: product_id
             }, include: {
