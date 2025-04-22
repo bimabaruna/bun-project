@@ -192,7 +192,7 @@ export class ProductService {
         }
 
         const ext = file.name.split('.').pop() || 'bin';
-        const gfilename = `products/${fileHash}.${ext}`;
+        const filename = `products/${fileHash}.${ext}`;
         const gcsFile = bucket.file(filename);
 
         console.log(`Attempting to upload ${file.name} as ${filename} to bucket ${bucketName}`);
