@@ -1,21 +1,12 @@
 import { toProductResponse, type CreateProductRequest, type ProductListResponse, type ProductResponse, type UpdateProductRequest } from "../model/product-model";
-import type { User, ProductCategory } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { productValidation, type ValidatedProductData } from "../validation/product-validation";
 import { prismaClient } from "../application/database";
 import { HTTPException } from "hono/http-exception";
-import { Storage } from '@google-cloud/storage'
 import { Readable } from 'stream'
 import { File } from 'formdata-node'
 import { bucket, bucketName } from '../utils/gcs'
-import path from 'path'
-
-
-// const keyPath = path.resolve(import.meta.dir, '../gcs-service-account.json')
-// console.log('Resolved Key Path:', keyPath)
-// const storage = new Storage({
-//   keyFilename: keyPath,
-// })
-// const bucket = storage.bucket(bucketName)
+import * as crypto from 'crypto';
 
 export class ProductService {
 
@@ -160,24 +151,63 @@ export class ProductService {
         }
     }
 
+    private static async calculateFileHash(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const hash = crypto.createHash('md5');
+            const fileStream = Readable.fromWeb(file.stream() as any);
+
+            fileStream.on('error', (err) => {
+                console.error('Error reading file stream for hashing:', err);
+                reject(new Error(`Failed to read file stream for hashing: ${file.name}`));
+            });
+
+            hash.on('error', (err) => {
+                console.error('Error during hash calculation:', err);
+                reject(new Error(`Failed to calculate hash for file: ${file.name}`));
+            });
+
+            hash.on('readable', () => {
+                const data = hash.read();
+                if (data) {
+                    resolve(data.toString('hex'));
+                }
+            });
+
+            fileStream.pipe(hash);
+        });
+    }
+
     private static async _uploadImageToGCS(file: File): Promise<string> {
+        let fileHash: string;
+
+        try {
+            fileHash = await this.calculateFileHash(file)
+        } catch {
+            console.error(`Failed to calculate hash for ${file.name}:`);
+            throw new Error(`Could not process file ${file.name} for upload.`);
+        }
         if (!bucket) {
-             console.error("GCS Bucket is not initialized. Cannot upload file.");
-             throw new Error("Storage service not available.");
+            console.error("GCS Bucket is not initialized. Cannot upload file.");
+            throw new Error("Storage service not available.");
         }
 
-        const ext = file.name.split('.').pop() || 'bin'; 
-        const filename = `products/${Date.now()}.${ext}`;
+        const ext = file.name.split('.').pop() || 'bin';
+        const gfilename = `products/${fileHash}.${ext}`;
         const gcsFile = bucket.file(filename);
 
         console.log(`Attempting to upload ${file.name} as ${filename} to bucket ${bucketName}`);
 
         const stream = gcsFile.createWriteStream({
             metadata: {
-                contentType: file.type || 'application/octet-stream', 
+                contentType: file.type || 'application/octet-stream',
+
+                metadata: {
+                    originalFilename: file.name,
+                    contentHash: fileHash
+                }
             },
             // public: true,
-            resumable: false, // Consider false for smaller files if needed
+            resumable: true, // OK for smaller files
         });
 
         return new Promise((resolve, reject) => {
@@ -192,9 +222,8 @@ export class ProductService {
                 resolve(publicUrl);
             });
 
-    
             try {
-                const readable = Readable.fromWeb(file.stream() as any); 
+                const readable = Readable.fromWeb(file.stream() as any);
                 readable.pipe(stream);
             } catch (pipeError) {
                 console.error(`Error piping file stream for ${filename}:`, pipeError);
@@ -205,7 +234,7 @@ export class ProductService {
 
     static async createV2(
         user: User,
-        data: ValidatedProductData, // Use validated data type from Zod
+        data: ValidatedProductData, // zod
         imageFile: File | null
     ): Promise<ProductResponse> {
 
@@ -222,22 +251,22 @@ export class ProductService {
             const product = await prismaClient.product.create({
                 data: {
                     name: data.name,
-                    price: data.price,       
+                    price: data.price,
                     quantity: data.quantity,
                     created_by: user.username,
                     category_id: data.categoryId,
-                    image_url: imageUrl 
+                    image_url: imageUrl
                 },
                 include: {
-                    product_category: true 
+                    product_category: true
                 }
             });
 
             return toProductResponse(product, product.product_category);
 
-        } catch(dbError) {
-             console.error("Database error during product creation:", dbError);
-             throw new Error("Failed to save product to database.");
+        } catch (dbError) {
+            console.error("Database error during product creation:", dbError);
+            throw new Error("Failed to save product to database.");
         }
     }
 }

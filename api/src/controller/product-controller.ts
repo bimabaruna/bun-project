@@ -11,7 +11,6 @@ import { productValidation } from "../validation/product-validation";
 
 export const productController = new Hono<{ Variables: ApplicationVariables }>()
 
-// productController.use(authMiddleware)
 
 productController.post('/products', authMiddleware, async (c) => {
     const user = c.get('user') as User
