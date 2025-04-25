@@ -55,8 +55,9 @@ productController.get('/products/:id', authMiddleware, async (c) => {
 })
 
 productController.delete('/products/:id', authMiddleware, async (c) => {
+    const user = c.get('user') as User
     const product_id = Number(c.req.param('id'))
-    const response = await ProductService.delete(product_id)
+    const response = await ProductService.delete(user, product_id)
 
     return c.json(
         response

@@ -67,6 +67,9 @@ model Product {
   created_by String
   updated_at DateTime? @updatedAt
   updated_by String?
+  is_deleted   Boolean  @default(false)
+  deleted_at DateTime?
+  deleted_by String?
   category_id Int?
   image_url String?
 

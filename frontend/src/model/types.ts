@@ -8,5 +8,5 @@ export interface Product {
 export interface ProductResponse {
   page: number;
   size: number;
-  products: Product[];
+  data: Product[];
 }

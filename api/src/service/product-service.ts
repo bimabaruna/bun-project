@@ -41,26 +41,32 @@ export class ProductService {
         const skip = (pageNumber - 1) * size
 
         const [products, totalCount] = await Promise.all([prismaClient.product.findMany({
-            where: product_name ? {
-                name: {
-                    contains: product_name,
-                    mode: 'insensitive',
-                },
-            } : undefined,
-            include: {
-                product_category: true
+            where: {
+                is_deleted: false,
+                ...(product_name && {
+                    name: {
+                        contains: product_name,
+                        mode: 'insensitive',
+                    },
+                }),
             },
-            skip: skip,
+            include: {
+                product_category: true,
+            },
+            skip,
             take: size,
         }), prismaClient.product.count({
-            where: product_name ? {
-                name: {
-                    contains: product_name,
-                    mode: 'insensitive'
-                },
-            } : undefined
+            where: {
+                is_deleted: false,
+                ...(product_name && {
+                    name: {
+                        contains: product_name,
+                        mode: 'insensitive',
+                    },
+                }),
+            }
         })
-        ])
+        ]);
 
         const mapped = products.map((product) =>
             toProductResponse(product, product.product_category)
@@ -84,6 +90,21 @@ export class ProductService {
         }
 
         const date = new Date().toISOString();
+
+        const getProduct = await prismaClient.product.findFirst({
+            where: { id: Number(product_id) }
+        })
+
+        if (!getProduct) {
+            throw new HTTPException(400, {
+                message: "Product Not Found"
+            })
+        }
+        if (getProduct.is_deleted === true) {
+            throw new HTTPException(400, {
+                message: "Product already deleted"
+            })
+        }
 
         const imageUrl = await prismaClient.product.findFirst({
             where: { id: Number(product_id) }
@@ -150,7 +171,7 @@ export class ProductService {
         return toProductResponse(product, product.product_category)
     }
 
-    static async delete(product_id: number): Promise<{}> {
+    static async delete(user: User, product_id: number): Promise<{}> {
 
         product_id = productValidation.DELETE.parse(product_id)
 
@@ -163,6 +184,11 @@ export class ProductService {
         if (!getProduct) {
             throw new HTTPException(400, {
                 message: "Product Not Found"
+            })
+        }
+        if (getProduct.is_deleted === true) {
+            throw new HTTPException(400, {
+                message: "Product already deleted"
             })
         }
 
@@ -186,15 +212,20 @@ export class ProductService {
             })
 
         }
+        const date = new Date().toISOString();
 
-        await prismaClient.product.delete({
+        await prismaClient.product.update({
             where: {
                 id: product_id
+            }, data: {
+                image_url: null,
+                is_deleted: true,
+                deleted_at: date.toString(),
+                deleted_by: user.name
             }, include: {
                 product_category: true
             }
         })
-
         return {
             message: 'Successfully deleted the product.'
         }

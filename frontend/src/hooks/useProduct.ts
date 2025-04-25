@@ -26,7 +26,7 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
                     }
                 );
 
-                const fetchedProducts = response.data?.products ?? [];
+                const fetchedProducts = response.data?.data ?? [];
                 setProducts(fetchedProducts);
             } catch (error) {
                 console.error("Failed to fetch products:", error);

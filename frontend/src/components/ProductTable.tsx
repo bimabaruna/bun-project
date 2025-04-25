@@ -23,7 +23,7 @@ export const ProductTable = ({ products }: ProductTableProps) => {
                 </button>
             </div>
             <table className="min-w-full bg-white border border-gray-200">
-                <thead className="bg-gray-100">
+                <thead className="md:flex-wrap bg-gray-100">
                     <tr>
                         <th className="text-left px-4 py-2 border-b">ID</th>
                         <th className="text-left px-4 py-2 border-b">Name</th>
