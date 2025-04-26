@@ -12,6 +12,7 @@ import { cors } from "hono/cors";
 import { roleController } from "./src/controller/role-controller";
 import { categoryController } from "./src/controller/category-controller";
 import { uploadController } from "./src/controller/upload-controller";
+import { outletController } from "./src/controller/outlet-controller";
 
 const app = new Hono()
 
@@ -40,6 +41,7 @@ app.route('/api', paymentController)
 app.route('/api', roleController)
 app.route('/api', categoryController)
 app.route('/api', uploadController)
+app.route('/api', outletController)
 
 app.use('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }))

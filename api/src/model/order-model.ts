@@ -19,17 +19,17 @@ export type OrderResponse = {
     items: OrderItems[]
 }
 
-export function toOrderResponse(order: Order & { 
-    order_items: { 
-        product_id: number; quantity: number ; product: { name: string }
-    }[] 
+export function toOrderResponse(order: Order & {
+    order_items: {
+        product_id: number; quantity: number; product: { name: string }
+    }[]
 }): OrderResponse {
     return {
         id: order.id,
-        customer_id: order.customer_id,
+        customer_id: order.cashier_id,
         status: order.status,
         items: order.order_items.map(item => ({
-            product_id: item.product_id, 
+            product_id: item.product_id,
             quantity: item.quantity,
             product_name: item.product.name
         })),

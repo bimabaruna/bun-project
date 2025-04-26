@@ -98,7 +98,7 @@ export class UserService {
 
         const response = toUserResponse(user, userLogin.role)
 
-        response.token = user.token!;
+        response.token = userLogin.token!;
         return response
     }
 

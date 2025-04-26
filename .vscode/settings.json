@@ -1,6 +1,6 @@
 {
     "editor.formatOnSave": true,
-    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.editor.enableAutoCompletions": false,
     "sqltools.connections": [
         {
             "previewLimit": 50,

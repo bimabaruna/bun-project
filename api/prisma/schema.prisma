@@ -22,7 +22,6 @@ model User {
   token    String?
 
   contacts Contact[]
-  orders   Order[]
   role     Role?   @relation(fields: [role_id], references: [id])
 
   @@map("users")
@@ -58,6 +57,39 @@ model Address {
   @@map("addresses")
 }
 
+model Employee {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  password String
+  name     String
+  outlet_id Int?
+
+  orders Order[]
+  shift     Shift[]
+  outlet Outlet? @relation(fields: [outlet_id], references: [id])
+  
+
+  @@map("employees")
+  
+}
+
+model Outlet {
+  id          Int     @id @default(autoincrement())
+  outlet_name String
+  address     String
+  phone       String
+  createdAt DateTime? @default(now())
+  craetedBy String?
+  updateAt DateTime?
+  updatedBy String?
+
+  products Product[]
+  employee Employee[]
+  shiift Shift[]
+
+  @@map("outlets")
+}
+
 model Product {
   id         Int       @id @default(autoincrement())
   name       String
@@ -71,18 +103,21 @@ model Product {
   deleted_at DateTime?
   deleted_by String?
   category_id Int?
+  outlet_id   Int?
   image_url String?
 
 
   order_items OrderItem[]
+  outlet  Outlet? @relation(fields: [outlet_id], references: [id])
   product_category ProductCategory? @relation(fields: [category_id], references: [id])
+  
 
   @@map("products")
 }
 
 model Order {
   id          Int      @id @default(autoincrement())
-  customer_id Int
+  cashier_id Int
   order_date  DateTime @default(now())
   total_price Decimal  @db.Decimal(10, 2)
   status      String   @default("on_progress")
@@ -90,7 +125,7 @@ model Order {
   order_items OrderItem[]
   payments    Payment[]
 
-  user User @relation(fields: [customer_id], references: [id])
+  user Employee @relation(fields: [cashier_id], references: [id])
 
   @@map("orders")
 }
@@ -138,3 +173,26 @@ model ProductCategory {
 
   @@map("product_category")
 }
+
+model Shift {
+  id Int @id @default(autoincrement())
+  employee_id Int
+  outlet_id Int
+  start_time DateTime
+  end_time DateTime?
+  total_cash Decimal
+
+  employee Employee @relation(fields: [employee_id], references: [id])
+  outlet Outlet @relation(fields: [outlet_id], references: [id])
+
+
+  @@map("shifts")
+}
+
+enum Orderstatus {
+  on_progress
+  completed
+  cancelled
+
+}
+

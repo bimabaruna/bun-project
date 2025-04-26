@@ -6,7 +6,7 @@ import { RoleService } from "../service/role-service";
 
 export const roleController = new Hono<{ Variables: ApplicationVariables }>()
 
-roleController.post('/roles', authMiddleware, async (c)=>{
+roleController.post('/roles', async (c) => {
 
     const request = await c.req.json() as CreateRoleRequest
 
@@ -17,7 +17,7 @@ roleController.post('/roles', authMiddleware, async (c)=>{
     })
 })
 
-roleController.get('/roles', authMiddleware, async (c)=>{
+roleController.get('/roles', authMiddleware, async (c) => {
     const response = await RoleService.get()
 
     return c.json(response)
