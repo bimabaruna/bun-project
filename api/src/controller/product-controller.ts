@@ -27,8 +27,9 @@ productController.get('/products', authMiddleware, async (c) => {
     const size = Number(c.req.query('size'))
     const page = Number(c.req.query('page'))
     const product_name = c.req.query('productName')
+    const outletId = Number(c.req.query('outletId'))
 
-    const response = await ProductService.getList(page, size, product_name)
+    const response = await ProductService.getList(page, size, product_name, outletId)
     console.log(response);
     return c.json(response)
 })
