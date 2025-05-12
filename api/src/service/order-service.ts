@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User, Employee } from '@prisma/client';
 import { prismaClient } from "../application/database";
 import { HTTPException } from "hono/http-exception";
 import { toOrderResponse, type CreateOrderRequest, type OrderResponse } from "../model/order-model";
@@ -7,7 +7,7 @@ import { orderValidation } from "../validation/order-validation";
 
 export class OrderService {
 
-    static async create(user: User, request: CreateOrderRequest): Promise<OrderResponse> {
+    static async create(employee: Employee, request: CreateOrderRequest): Promise<OrderResponse> {
 
         request = orderValidation.CREATE.parse(request);
 
@@ -55,7 +55,7 @@ export class OrderService {
             // Create order
             const order = await prisma.order.create({
                 data: {
-                    customer_id: user.id,
+                    cashier_id: employee.id,
                     total_price: totalPrice,
                     status: "on_progress",
                     order_items: {

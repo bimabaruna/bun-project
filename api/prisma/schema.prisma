@@ -62,7 +62,14 @@ model Employee {
   username String  @unique
   password String
   name     String
-  outlet_id Int?
+  outlet_id Int
+  createdAt DateTime? @default(now())
+  craetedBy String?
+  updated_at DateTime? @updatedAt
+  updated_by String?
+  is_deleted Boolean @default(false)
+  deleted_at DateTime?
+  deleted_by String?
 
   orders Order[]
   shift     Shift[]
@@ -85,7 +92,7 @@ model Outlet {
 
   products Product[]
   employee Employee[]
-  shiift Shift[]
+  shift Shift[]
 
   @@map("outlets")
 }
