@@ -27,9 +27,10 @@ export class ProductService {
                 quantity: request.quantity,
                 created_by: user.username,
                 category_id: request.categoryId,
-                image_url: request.imageUrl
+                image_url: request.imageUrl,
+                outlet_id: request.outletId
             }, include: {
-                product_category: true
+                product_category: true, outlet: true
             }
         })
         return toProductResponse(product, product.product_category)
@@ -143,7 +144,8 @@ export class ProductService {
                 updated_at: date.toString(),
                 updated_by: user.username,
                 category_id: request.categoryId,
-                image_url: request.imageUrl
+                image_url: request.imageUrl,
+                outlet_id: request.outletId ?? null,
             }, include: {
                 product_category: true
             }

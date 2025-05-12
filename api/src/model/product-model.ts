@@ -4,7 +4,8 @@ export type CreateProductRequest = {
     name: string;
     price: number;
     quantity: number;
-    categoryId?: number ;
+    categoryId?: number;
+    outletId?: number;
     imageUrl?: string;
 }
 
@@ -13,6 +14,7 @@ export type ProductResponse = {
     name: string;
     price: number;
     quantity: number;
+    outletId?: number;
     createdAt?: Date;
     createdBy?: string;
     updatedAt?: Date | null;
@@ -28,6 +30,7 @@ export type UpdateProductRequest = {
     quantity: number;
     categoryId?: number;
     imageUrl?: string;
+    outletId?: number;
 }
 
 export function toProductResponse(product: Product, category?: ProductCategory | null): ProductResponse {
@@ -36,6 +39,7 @@ export function toProductResponse(product: Product, category?: ProductCategory |
         name: product.name,
         price: Number(product.price),
         quantity: product.quantity,
+        outletId: product.outlet_id ?? undefined,
         createdAt: product.created_at,
         createdBy: product.created_by,
         updatedAt: product.updated_at ?? null,
@@ -52,5 +56,5 @@ export type ProductListResponse = {
     totalCount: number,
     lastPage: number,
     data: ProductResponse[],
-    
+
 }
