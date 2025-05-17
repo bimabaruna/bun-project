@@ -185,7 +185,8 @@ export class UserService {
                 },
             } : undefined,
             include: {
-                role: true
+                role: true,
+                user_details: true
             },
             skip: skip,
             take: size
@@ -199,15 +200,9 @@ export class UserService {
         })
         ])
 
-        const transformedUsers = userList.map(user => ({
-            id: user.id,
-            username: user.username,
-            name: user.name,
-            roleId: user.role_id ?? null,
-            roleName: user.role?.role_name ?? null
-
-        }))
-
+        const transformedUsers = userList.map((user) => 
+            toUserResponse(user, user.role)
+        );
 
         return {
             page: page,
@@ -226,13 +221,13 @@ export class UserService {
             }
         })
         if (!userExist) {
-            throw new HTTPException(400, {message: 'User not found'})
+            throw new HTTPException(400, { message: 'User not found' })
         }
 
-        if(id === user.id){
-            throw new HTTPException(400, {message: 'Cannot delete yourself'})
+        if (id === user.id) {
+            throw new HTTPException(400, { message: 'Cannot delete yourself' })
         }
-        
+
         await prismaClient.user.delete({
             where: {
                 id: id
@@ -250,9 +245,10 @@ export class UserService {
             where: {
                 id: id
             }, include: {
+                user_details: true,
                 role: true
             }
-        })
+        });
 
         if (!user) {
             throw new HTTPException(400, {

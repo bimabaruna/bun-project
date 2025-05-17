@@ -1,6 +1,6 @@
 import { password } from "bun";
 import { prismaClient } from "../application/database";
-import { toEmployeeResponse, type EmployeeListResponse, type EmployeeRequestModel, type EmployeeResponse } from "../model/employee-model";
+import { toEmployeeResponse, type EmployeeListResponse, type EmployeeRequestModel, type EmployeeResponse, type EmployeeUpdateModel } from "../model/employee-model";
 import { employeeValidation } from "../validation/employee-validation";
 import { toUserResponse } from "../model/user-model";
 import { connect } from "http2";
@@ -13,24 +13,52 @@ export class EmployeeService {
 
     static async create(user: User, request: EmployeeRequestModel): Promise<EmployeeResponse> {
 
-        const req = employeeValidation.CREATE.safeParse(request)
+        const req = employeeValidation.CREATE.safeParse(request);
 
-        request.password = await Bun.password.hash(request.password, {
-            algorithm: "bcrypt",
-            cost: 10,
+        const userExist = await prismaClient.user.findFirst({
+            where: {
+                id: request.userId
+            }
         })
 
-        const employee = await prismaClient.employee.create({
+        if (!userExist) {
+            throw new HTTPException(400, {
+                message: 'User not found'
+            })
+        }
+        const outletExist = await prismaClient.outlet.findFirst({
+            where: {
+                id: request.outletId
+            }
+        })
+        if (!outletExist) {
+            throw new HTTPException(400, {
+                message: 'Outlet not found'
+            })
+        }
+
+        const employeeExist = await prismaClient.employeeDetails.findFirst({
+            where: {
+                user_id: request.userId
+            }
+        })
+
+        if (employeeExist) {
+            throw new HTTPException(400, {
+                message: 'Employee already have an employee account'
+            })
+        }
+
+        const employee = await prismaClient.employeeDetails.create({
             data: {
-                username: request.username,
-                name: request.fullName,
-                password: request.password,
-                craetedBy: user.name,
-                outlet: {
-                    connect: {
-                        id: request.outletId
-                    }
-                }
+                user_id: request.userId,
+                outlet_id: request.outletId,
+                first_name: request.firstName,
+                last_name: request.lastName,
+                email: request.email,
+                phone: request.phone,
+                position: request.position,
+                salary: request.salary,
             }, include: {
                 outlet: true
             }
@@ -39,119 +67,114 @@ export class EmployeeService {
         return toEmployeeResponse(employee)
     }
 
-    static async getList(page: number, size: number, employeeName?: string): Promise<EmployeeListResponse> {
-        const pageNumber = Math.max(1, page)
-        const skip = (pageNumber - 1) * size
+    // static async getList(page: number, size: number, employeeName?: string): Promise<EmployeeListResponse> {
+    //     const pageNumber = Math.max(1, page)
+    //     const skip = (pageNumber - 1) * size
 
-        const [employeeList, totalCount] = await Promise.all([prismaClient.employee.findMany({
-            where: { is_deleted: false,
-              ...(employeeName ? {
-                is_deleted: false,
-                name: {
-                    contains: employeeName,
-                    mode: 'insensitive'
-                }
-            } : {}),
-        } ,
-            include: {
-                outlet: true
-            },
-            skip: skip,
-            take: size
-        }), prismaClient.employee.count({
-            where: { is_deleted: false,
-                ...(employeeName ? {
-                  is_deleted: false,
-                  name: {
-                      contains: employeeName,
-                      mode: 'insensitive'
-                  }
-              } : {}),
-          } 
-        })
+    //     const [employeeList, totalCount] = await Promise.all([prismaClient.employeeDetails.findMany({
+    //         where: {
+    //             is_deleted: false,
+    //             ...(employeeName ? {
+    //                 is_deleted: false,
+    //                 name: {
+    //                     contains: employeeName,
+    //                     mode: 'insensitive'
+    //                 }
+    //             } : {}),
+    //         },
+    //         include: {
+    //             outlet: true
+    //         },
+    //         skip: skip,
+    //         take: size
+    //     }), prismaClient.employeeDetails.count({
+    //         where: {
+    //             is_deleted: false,
+    //             ...(employeeName ? {
+    //                 is_deleted: false,
+    //                 name: {
+    //                     contains: employeeName,
+    //                     mode: 'insensitive'
+    //                 }
+    //             } : {}),
+    //         }
+    //     })
 
-        ])
+    //     ])
 
-        const mapped = employeeList.map((employee)=> toEmployeeResponse(employee))
+    //     const mapped = employeeList.map((employee) => toEmployeeResponse(employee))
 
-        return {
-            page: page,
-            size: size,
-            totalCount,
-            lastPage: Math.ceil(totalCount/size),
-            data: mapped
-        }
-    }
+    //     return {
+    //         page: page,
+    //         size: size,
+    //         totalCount,
+    //         lastPage: Math.ceil(totalCount / size),
+    //         data: mapped
+    //     }
+    // }
 
-    static async update(user: User, employeeId : number, request: EmployeeRequestModel): Promise<EmployeeResponse>{
+    static async update(user: User, employeeId: number, request: EmployeeUpdateModel): Promise<EmployeeResponse> {
 
         const result = employeeValidation.UPDATE.safeParse(request)
 
-        request.password = await Bun.password.hash(request.password, {
-            algorithm: "bcrypt",
-            cost: 10,
-        })
-
-        let employee = await prismaClient.employee.findFirst({
+        let employee = await prismaClient.employeeDetails.findFirst({
             where: {
-                is_deleted: false,
                 id: employeeId
             }
         })
-        
-        if(!employee){
+
+        if (!employee) {
             throw new HTTPException(400, {
                 message: 'Employee not found'
             })
         }
 
-        employee = await prismaClient.employee.update({
-            where:{
+        employee = await prismaClient.employeeDetails.update({
+            where: {
                 id: employeeId
             }, data: {
-                username: request.username,
-                name: request.fullName,
-                password: request.password,
-                updated_by: user.name,
-                outlet: {
-                    connect: {
-                        id: request.outletId
-                    }
-                }
+                user_id: request.userId,
+                outlet_id: request.outletId,
+                first_name: request.firstName,
+                last_name: request.lastName,
+                email: request.email,
+                phone: request.phone,
+                position: request.position,
+                salary: request.salary,
             }, include: {
                 outlet: true
-                
+
             }
         })
 
         return toEmployeeResponse(employee)
     }
 
-    static async delete(user: User, employeeId: number ): Promise<{}>{
+    // static async delete(user: User, employeeId: number): Promise<{}> {
 
-        const employeeExist = await prismaClient.employee.count({
-            where:{
-                id: employeeId
-            }
-        })
+    //     const employeeExist = await prismaClient.employeeDetails.count({
+    //         where: {
+    //             id: employeeId
+    //         }
+    //     })
 
-        if(!employeeExist){
-            throw new HTTPException(400, { message: "Employee not found"})
-        }
-        const date = new Date().toISOString();
-        await prismaClient.employee.update({
-            where: {
-                id: employeeId
-            }, data:{
-                deleted_at: date.toString(),
-                deleted_by: user.name,
-                is_deleted: true
-            }
-        })
+    //     if (!employeeExist) {
+    //         throw new HTTPException(400, { message: "Employee not found" })
+    //     }
+    //     const date = new Date().toISOString();
+    //     await prismaClient.employeeDetails.update({
+    //         where: {
+    //             id: employeeId
+    //         }, data: {
+    //             deleted_at: date.toString(),
+    //             deleted_by: user.name,
+    //             is_deleted: true
+    //         }
+    //     })
 
-        return {
-            message: 'Successfully deleted the product.'
-        }
+    //     return {
+    //         message: 'Successfully deleted the product.'
+    //     }
 
-    }
+    // }
 }

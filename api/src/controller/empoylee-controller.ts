@@ -23,15 +23,6 @@ employeeController.post('/employee', authMiddleware, async (c) => {
     })
 })
 
-employeeController.get('/employee', authMiddleware, async (c) => {
-    const size = Number(c.req.query('size'))
-    const page = Number(c.req.query('page'))
-    const employeeName = c.req.query('employeeName')
-
-    const response = await EmployeeService.getList(page, size, employeeName)
-
-    return c.json(response)
-})
 
 employeeController.patch('/employee/:id', authMiddleware, async (c) => {
     const employeeId = Number(c.req.param('id'))
@@ -45,13 +36,3 @@ employeeController.patch('/employee/:id', authMiddleware, async (c) => {
     })
 })
 
-employeeController.delete('/employee/:id', authMiddleware, async (c) => {
-    const employeeId = Number(c.req.param('id'))
-    const user = c.get('user') as User
-
-    const response = await EmployeeService.delete(user, employeeId)
-
-    return c.json(
-        response
-    )
-})

@@ -1,25 +1,36 @@
-import type { Employee } from "@prisma/client"
+import type { EmployeeDetails } from "@prisma/client"
 
 
 export type EmployeeRequestModel = {
-    username: string,
-    fullName: string,
-    password: string
+    userId: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    position: string,
+    salary: number,
     outletId: number,
-    
+
 }
 export type EmployeeResponse = {
-    id: number,
-    name: string,
-    username: string,
-    outletId: number,
-    token? : string
+    userId: number,
+    firstName: string,
+    lastName: string | undefined,
+    email: string,
+    phone: string,
+    position: string,
+    salary: number,
+    outletId?: number | null,
 }
 
 export type EmployeeUpdateModel = {
-    username: string,
-    fullName: string,
-    password: string
+    userId: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    position: string,
+    salary: number,
     outletId: number,
 }
 
@@ -31,12 +42,15 @@ export type EmployeeListResponse = {
     data: EmployeeResponse[]
 }
 
-export function toEmployeeResponse(employee: Employee): EmployeeResponse {
+export function toEmployeeResponse(employee: EmployeeDetails): EmployeeResponse {
     return {
-        id: employee.id,
-        username: employee.username,
-        name: employee.name,
-        outletId: employee.outlet_id
+        userId: employee.id,
+        outletId: employee.outlet_id ?? null,
+        firstName: employee.first_name,
+        lastName: employee.last_name ?? undefined,
+        email: employee.email,
+        phone: employee.phone,
+        position: employee.position,
+        salary: Number(employee.salary),
     }
-
 }

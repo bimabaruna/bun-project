@@ -22,9 +22,48 @@ model User {
   token    String?
 
   contacts Contact[]
-  role     Role?   @relation(fields: [role_id], references: [id])
+  orders   Order[]
+
+  user_details EmployeeDetails? @relation("UserEmployeeDetails")
+  role         Role?            @relation(fields: [role_id], references: [id])
 
   @@map("users")
+}
+
+model EmployeeDetails {
+  id         Int     @id @default(autoincrement())
+  user_id    Int     @unique
+  outlet_id  Int
+  first_name String
+  last_name  String?
+  email      String
+  phone      String
+  position   String
+  salary     Decimal
+
+  shift  Shift[]
+  user   User    @relation("UserEmployeeDetails", fields: [user_id], references: [id])
+  outlet Outlet  @relation(fields: [outlet_id], references: [id])
+
+  @@map("employee_details")
+}
+
+model Outlet {
+  id          Int       @id @default(autoincrement())
+  outlet_name String
+  address     String
+  phone       String
+  createdAt   DateTime? @default(now())
+  craetedBy   String?
+  updateAt    DateTime?
+  updatedBy   String?
+
+  products  Product[]
+  // employee Employee[]
+  employees EmployeeDetails[]
+  shift     Shift[]
+
+  @@map("outlets")
 }
 
 model Contact {
@@ -57,74 +96,53 @@ model Address {
   @@map("addresses")
 }
 
-model Employee {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
-  password String
-  name     String
-  outlet_id Int
-  createdAt DateTime? @default(now())
-  craetedBy String?
-  updated_at DateTime? @updatedAt
-  updated_by String?
-  is_deleted Boolean @default(false)
-  deleted_at DateTime?
-  deleted_by String?
+// model Employee {
+//   id         Int       @id @default(autoincrement())
+//   username   String    @unique
+//   password   String
+//   name       String
+//   outlet_id  Int
+//   createdAt  DateTime? @default(now())
+//   craetedBy  String?
+//   updated_at DateTime? @updatedAt
+//   updated_by String?
+//   is_deleted Boolean   @default(false)
+//   deleted_at DateTime?
+//   deleted_by String?
 
-  orders Order[]
-  shift     Shift[]
-  outlet Outlet? @relation(fields: [outlet_id], references: [id])
-  
+//   orders Order[]
+//   shift  Shift[]
+//   outlet Outlet? @relation(fields: [outlet_id], references: [id])
 
-  @@map("employees")
-  
-}
-
-model Outlet {
-  id          Int     @id @default(autoincrement())
-  outlet_name String
-  address     String
-  phone       String
-  createdAt DateTime? @default(now())
-  craetedBy String?
-  updateAt DateTime?
-  updatedBy String?
-
-  products Product[]
-  employee Employee[]
-  shift Shift[]
-
-  @@map("outlets")
-}
+//   @@map("employees")
+// }
 
 model Product {
-  id         Int       @id @default(autoincrement())
-  name       String
-  price      Decimal
-  quantity   Int
-  created_at DateTime  @default(now())
-  created_by String
-  updated_at DateTime? @updatedAt
-  updated_by String?
-  is_deleted   Boolean  @default(false)
-  deleted_at DateTime?
-  deleted_by String?
+  id          Int       @id @default(autoincrement())
+  name        String
+  price       Decimal
+  quantity    Int
+  created_at  DateTime  @default(now())
+  created_by  String
+  updated_at  DateTime? @updatedAt
+  updated_by  String?
+  is_deleted  Boolean   @default(false)
+  deleted_at  DateTime?
+  deleted_by  String?
   category_id Int?
   outlet_id   Int?
-  image_url String?
+  image_url   String?
 
-
-  order_items OrderItem[]
-  outlet  Outlet? @relation(fields: [outlet_id], references: [id])
+  order_items      OrderItem[]
+  outlet           Outlet?          @relation(fields: [outlet_id], references: [id])
   product_category ProductCategory? @relation(fields: [category_id], references: [id])
-  
 
   @@map("products")
 }
 
 model Order {
   id          Int      @id @default(autoincrement())
-  cashier_id Int
+  cashier_id  Int
   order_date  DateTime @default(now())
   total_price Decimal  @db.Decimal(10, 2)
   status      String   @default("on_progress")
@@ -132,7 +150,7 @@ model Order {
   order_items OrderItem[]
   payments    Payment[]
 
-  user Employee @relation(fields: [cashier_id], references: [id])
+  user User @relation(fields: [cashier_id], references: [id])
 
   @@map("orders")
 }
@@ -167,13 +185,13 @@ model Role {
   id        Int    @id @default(autoincrement())
   role_name String
 
-  users     User[] 
+  users User[]
 
   @@map("role")
 }
 
 model ProductCategory {
-  id Int @id @default(autoincrement())
+  id            Int    @id @default(autoincrement())
   category_name String
 
   products Product[]
@@ -182,16 +200,15 @@ model ProductCategory {
 }
 
 model Shift {
-  id Int @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   employee_id Int
-  outlet_id Int
-  start_time DateTime
-  end_time DateTime?
-  total_cash Decimal
+  outlet_id   Int
+  start_time  DateTime
+  end_time    DateTime?
+  total_cash  Decimal
 
-  employee Employee @relation(fields: [employee_id], references: [id])
-  outlet Outlet @relation(fields: [outlet_id], references: [id])
-
+  employee EmployeeDetails @relation(fields: [employee_id], references: [id])
+  outlet   Outlet          @relation(fields: [outlet_id], references: [id])
 
   @@map("shifts")
 }
@@ -200,6 +217,4 @@ enum Orderstatus {
   on_progress
   completed
   cancelled
-
 }
-
