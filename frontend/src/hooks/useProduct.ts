@@ -1,4 +1,3 @@
-// hooks/useProducts.ts
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Product, ProductResponse } from '../model/types';
@@ -7,9 +6,9 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [pageNumber, setPageNumber] = useState(initialPageNumber);
+    const [lastPage, setLastPage] = useState(1)
     const size = pageSize;
 
-    // Convert page number to skip value (0-indexed)
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -27,7 +26,9 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
                 );
 
                 const fetchedProducts = response.data?.data ?? [];
+                const responseData = response.data;
                 setProducts(fetchedProducts);
+                setLastPage(responseData.lastPage);
             } catch (error) {
                 console.error("Failed to fetch products:", error);
                 setProducts([]);
@@ -44,8 +45,10 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
     };
 
     const handleNext = () => {
-        if (products.length === size) setPageNumber(pageNumber + 1);
+        setPageNumber((prev) => prev + 1);
     };
+
+    const hasMore: boolean = pageNumber < lastPage;
 
     return {
         products,
@@ -53,7 +56,7 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
         pageNumber,
         handlePrev,
         handleNext,
-        hasMore: products.length === size,
+        hasMore,
         isEmpty: products.length === 0
     };
 };
