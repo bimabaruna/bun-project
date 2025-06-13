@@ -1,11 +1,17 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCategory } from "../hooks/useCategory";
+import { useOutlets } from "../hooks/useOutlet";
 
 export default function CreateProduct() {
     const [name, setName] = useState("");
     const [price, setPrice] = useState<number>(0);
     const [quantity, setQuantity] = useState<number>(0);
+    const { categories } = useCategory();
+    const [category, setCategory] = useState<number>(0);
+    const { outlets } = useOutlets(); // Assuming outlets is an array of outlet IDs
+    const [outlet, setOutlet] = useState<number>(0); // Assuming outlet is a single outlet ID
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +29,8 @@ export default function CreateProduct() {
                 name,
                 price,
                 quantity,
+                categoryId: category,
+                outletId: outlet  // Assuming category is the ID of the selected category
             },
                 {
                     headers: {
@@ -77,6 +85,40 @@ export default function CreateProduct() {
                         className="w-full border px-3 py-2 rounded"
                         placeholder="Quantity"
                     />
+                </div>
+                <div>
+                    <label className="block text-gray-700">Category</label>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(Number(e.target.value))}
+                        required
+                        className={`w-full border px-3 py-2 rounded ${category ? "text-gray-700 capitalize" : "text-gray-500 "
+                            }`}
+                    >
+                        <option value="" className="text-gray-700">Select a Category</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id} className="text-gray-700 capitalize">
+                                {cat.categoryName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-gray-700">Outlet</label>
+                    <select
+                        value={outlet}
+                        onChange={(e) => setOutlet(Number(e.target.value))}
+                        required
+                        className={`w-full border px-3 py-2 rounded ${outlet ? "text-gray-700 capitalize" : "text-gray-500 "
+                            }`}
+                    >
+                        <option value="" className="text-gray-700">Select a Outlets</option>
+                        {outlets.map((cat) => (
+                            <option key={cat.id} value={cat.id} className="text-gray-700 capitalize">
+                                {cat.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
                 {error && <p className="text-red-500">{error}</p>}
                 <div className="flex justify-end">

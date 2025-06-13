@@ -1,4 +1,4 @@
-import type { Product, ProductCategory } from "@prisma/client";
+import type { Product, ProductCategory, Outlet } from "@prisma/client";
 
 export type CreateProductRequest = {
     name: string;
@@ -22,6 +22,7 @@ export type ProductResponse = {
     imageUrl?: string | null;
     categoryId?: number | null;
     categoryName?: string | null;
+    outletName?: string | null;
 }
 
 export type UpdateProductRequest = {
@@ -33,7 +34,7 @@ export type UpdateProductRequest = {
     outletId?: number;
 }
 
-export function toProductResponse(product: Product, category?: ProductCategory | null): ProductResponse {
+export function toProductResponse(product: Product, category?: ProductCategory | null, outlet?: Outlet | null): ProductResponse {
     return {
         id: product.id,
         name: product.name,
@@ -46,7 +47,8 @@ export function toProductResponse(product: Product, category?: ProductCategory |
         updatedBy: product.updated_by ?? null,
         categoryId: product.category_id ?? null,
         imageUrl: product.image_url ?? null,
-        categoryName: category?.category_name ?? null
+        categoryName: category?.category_name ?? null,
+        outletName: outlet?.outlet_name ?? null
     }
 }
 

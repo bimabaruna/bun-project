@@ -29,17 +29,21 @@ export const ProductTable = ({ products }: ProductTableProps) => {
                         <th className="text-left px-4 py-2 border-b">Name</th>
                         <th className="text-left px-4 py-2 border-b">Quantity</th>
                         <th className="text-left px-4 py-2 border-b">Price</th>
+                        <th className="text-left px-4 py-2 border-b">Category</th>
+                        <th className="text-left px-4 py-2 border-b capitalize">Outlet</th>
                     </tr>
                 </thead>
                 <tbody>
                     {products.map((product) => (
                         <tr key={product.id} className="hover:bg-gray-50">
                             <td className="px-4 py-2 border-b">{product.id}</td>
-                            <td className="px-4 py-2 border-b">{product.name}</td>
+                            <td className="px-4 py-2 border-b capitalize">{product.name}</td>
                             <td className="px-4 py-2 border-b">{product.quantity}</td>
                             <td className="px-4 py-2 border-b">
                                 Rp {product.price.toLocaleString()}
                             </td>
+                            <td className="px-4 py-2 border-b capitalize">{product.categoryName}</td>
+                            <td className="px-4 py-2 border-b capitalize">{product.outletName}</td>
                         </tr>
                     ))}
                 </tbody>

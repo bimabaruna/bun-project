@@ -11,9 +11,11 @@ export default function ProductList() {
         pageNumber,
         handlePrev,
         handleNext,
-        hasMore,
+        hasMore ,
         isEmpty
+        
     } = useProducts();
+    
 
     if (loading) return <LoadingIndicator />;
 

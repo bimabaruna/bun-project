@@ -51,11 +51,12 @@ export class ProductService {
                     },
                 }),
                 ...(outlet_id && {
-                    outlet_id: outlet_id
+                    outlet_id: outlet_id,
                 })
             },
             include: {
                 product_category: true,
+                outlet: true
             },
             skip,
             take: size,
@@ -69,14 +70,14 @@ export class ProductService {
                     },
                 }),
                 ...(outlet_id && {
-                    outlet_id: outlet_id
+                    outlet_id: outlet_id,
                 })
             }
         })
         ]);
 
         const mapped = products.map((product) =>
-            toProductResponse(product, product.product_category)
+            toProductResponse(product, product.product_category, product.outlet)
         );
         return {
             page: page,
