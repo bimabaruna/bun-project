@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Product, ProductResponse } from '../model/types';
 
-export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
+export const useProducts = (initialPageNumber = 1, pageSize = 10) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [pageNumber, setPageNumber] = useState(initialPageNumber);
@@ -24,9 +24,9 @@ export const useProducts = (initialPageNumber = 1, pageSize = 5) => {
                         },
                     }
                 );
-
-                const fetchedProducts = response.data?.data ?? [];
                 const responseData = response.data;
+                const fetchedProducts = responseData.data ?? [];
+
                 setProducts(fetchedProducts);
                 setLastPage(responseData.lastPage);
             } catch (error) {

@@ -12,6 +12,10 @@ export const ProductTable = ({ products }: ProductTableProps) => {
         navigate('/dashboard/products/create-product');
     };
 
+    const handleRowClick = (productId: string | number) => {
+        navigate(`/dashboard/products/${productId}`);
+    };
+
     return (
         <div className="overflow-x-auto rounded-lg shadow">
             <div className="md:flex justify-end mb-4">
@@ -35,7 +39,11 @@ export const ProductTable = ({ products }: ProductTableProps) => {
                 </thead>
                 <tbody>
                     {products.map((product) => (
-                        <tr key={product.id} className="hover:bg-gray-50">
+                        <tr key={product.id}
+                            className="hover:bg-gray-50"
+                            onClick={() => handleRowClick(product.id)}>
+
+
                             <td className="px-4 py-2 border-b">{product.id}</td>
                             <td className="px-4 py-2 border-b capitalize">{product.name}</td>
                             <td className="px-4 py-2 border-b">{product.quantity}</td>

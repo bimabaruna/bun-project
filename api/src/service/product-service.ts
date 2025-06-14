@@ -154,11 +154,12 @@ export class ProductService {
                 image_url: request.imageUrl,
                 outlet_id: request.outletId ?? null,
             }, include: {
-                product_category: true
+                product_category: true,
+                outlet: true
             }
         })
 
-        return toProductResponse(product, product.product_category)
+        return toProductResponse(product, product.product_category, product.outlet)
 
     }
 
