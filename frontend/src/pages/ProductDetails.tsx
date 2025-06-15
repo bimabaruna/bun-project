@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useCategory } from "../hooks/useCategory";
 import { useOutlets } from "../hooks/useOutlet";
 import { UploadImageInput } from "../components/UploadImageInput";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export default function ProductDetails() {
     const { id } = useParams();
@@ -23,7 +22,7 @@ export default function ProductDetails() {
     const [updatedby, setUpdatedBy] = useState<string | null>(null);
     const [imageUrl, setImageUrl] = useState<string>("");
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imageLoading, setImageLoading] = useState(true);
+
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
@@ -47,7 +46,6 @@ export default function ProductDetails() {
                 setCreatedAt(product.updatedAt);
                 setUpdatedBy(product.updatedBy);
                 setImageUrl(product.imageUrl || "");
-                setImageLoading(false);
             } catch (err: any) {
                 setError(err.message || "Something went wrong");
             } finally {
@@ -229,7 +227,6 @@ export default function ProductDetails() {
                     </button>
 
                 </div>
-
             </form>
         </div>
     );
