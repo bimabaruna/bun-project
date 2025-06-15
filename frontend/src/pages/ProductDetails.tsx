@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useCategory } from "../hooks/useCategory";
 import { useOutlets } from "../hooks/useOutlet";
 import { UploadImageInput } from "../components/UploadImageInput";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export default function ProductDetails() {
     const { id } = useParams();
@@ -22,10 +23,9 @@ export default function ProductDetails() {
     const [updatedby, setUpdatedBy] = useState<string | null>(null);
     const [imageUrl, setImageUrl] = useState<string>("");
     const [imageFile, setImageFile] = useState<File | null>(null);
-
+    const [imageLoading, setImageLoading] = useState(true);
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
-
 
     useEffect(() => {
         if (!productId) return;
@@ -46,6 +46,8 @@ export default function ProductDetails() {
                 setOutlet(product.outletId);
                 setCreatedAt(product.updatedAt);
                 setUpdatedBy(product.updatedBy);
+                setImageUrl(product.imageUrl || "");
+                setImageLoading(false);
             } catch (err: any) {
                 setError(err.message || "Something went wrong");
             } finally {
@@ -89,14 +91,12 @@ export default function ProductDetails() {
         }
     };
 
-
     return (
 
         <div className="flex- w-full h-fit bg-white p-6 rounded shadow">
             <h1 className="text-2xl font-bold mb-4">Product Detail</h1>
             <form onSubmit={handleEdit} className="space-y-4">
                 <div className="flex justify-end">
-
                 </div>
                 <div>
                     <label className="block text-gray-700">Name</label>
@@ -170,6 +170,15 @@ export default function ProductDetails() {
                         ))}
                     </select>
 
+                    {!edit && (<div className="relative mt-4 mb-8 w-60 h-60">
+                        <label className="text-gray-700">Product Image</label>
+                        <img
+                            src={imageUrl}
+                            className="w-60 h-60 object-cover rounded-xl border border-gray-300 shadow-md transition duration-300"
+
+                        />
+
+                    </div>)}
                     {edit && (
                         <div>
                             <UploadImageInput

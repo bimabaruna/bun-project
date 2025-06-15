@@ -25,7 +25,6 @@ export default function CreateProduct() {
         setLoading(true);
         setError(null);
 
-
         try {
 
             const payload: any = {
