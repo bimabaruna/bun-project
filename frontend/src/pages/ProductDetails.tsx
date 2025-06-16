@@ -15,7 +15,7 @@ export default function ProductDetails() {
     const [category, setCategory] = useState<number>(0);
     const { outlets } = useOutlets(); // Assuming outlets is an array of outlet IDs
     const [outlet, setOutlet] = useState<number>(0); // Assuming outlet is a single outlet ID
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [edit, setEdit] = useState(false);
     const [updatedAt, setCreatedAt] = useState<string | null>(null);
@@ -89,6 +89,32 @@ export default function ProductDetails() {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="flex w-full h-fit bg-white p-6 rounded shadow animate-pulse space-y-4 flex-col">
+                <div className="h-6 bg-gray-300 rounded w-1/3" />
+                <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i}>
+                            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2" />
+                            <div className="h-10 bg-gray-200 rounded w-full" />
+                        </div>
+                    ))}
+                    <div>
+                        <div className="h-4 bg-gray-300 rounded w-1/4 mb-2" />
+                        <div className="w-60 h-60 bg-gray-200 rounded-xl" />
+                    </div>
+                    <div className="h-4 bg-gray-300 rounded w-1/3 mt-4" />
+                    <div className="h-4 bg-gray-300 rounded w-1/4" />
+                    <div className="flex justify-end gap-2 mt-6">
+                        <div className="h-10 w-24 bg-gray-300 rounded" />
+                        <div className="h-10 w-36 bg-gray-300 rounded" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
 
         <div className="flex- w-full h-fit bg-white p-6 rounded shadow">
@@ -111,8 +137,8 @@ export default function ProductDetails() {
                 <div>
                     <label className="block text-gray-700">Price</label>
                     <input
-                        type="integer"
-                        value={price}
+                        type="text"
+                        value={price.toLocaleString()}
                         onChange={(e) => setPrice(Number(e.target.value))}
                         required
                         className={`w-full border px-3 py-2 rounded transition ${edit ? 'bg-white text-black' : 'bg-gray-50 text-gray-500 cursor-not-allowed'}`}
@@ -123,13 +149,14 @@ export default function ProductDetails() {
                 <div>
                     <label className="block text-gray-700">Quantity</label>
                     <input
-                        type="integer"
+                        type="number"
                         value={quantity}
                         onChange={(e) => setQuantity(Number(e.target.value))}
                         required
                         className={`w-full border px-3 py-2 rounded transition ${edit ? 'bg-white text-black' : 'bg-gray-50 text-gray-500 cursor-not-allowed'}`}
                         placeholder="Quantity"
                         disabled={!edit}
+
                     />
                 </div>
                 <div>
