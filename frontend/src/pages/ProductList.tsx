@@ -11,11 +11,11 @@ export default function ProductList() {
         pageNumber,
         handlePrev,
         handleNext,
-        hasMore ,
-        isEmpty
-        
+        hasMore,
+        isEmpty,
+        deleteProduct,
+        refetch
     } = useProducts();
-    
 
     if (loading) return <LoadingIndicator />;
 
@@ -27,11 +27,13 @@ export default function ProductList() {
                 <EmptyState />
             ) : (
                 <>
-                    <ProductTable products={products} />
-
+                    <ProductTable
+                        products={products}
+                        deleteProduct={deleteProduct}
+                        refetch={refetch}
+                    />
                     <Pagination
                         pageNumber={pageNumber}
-
                         onPrev={handlePrev}
                         onNext={handleNext}
                         isFirstPage={pageNumber === 1}

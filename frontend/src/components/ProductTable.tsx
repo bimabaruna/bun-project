@@ -1,12 +1,20 @@
 import { Product } from '../model/types';
 import { useNavigate } from 'react-router-dom';
+import { MdDeleteOutline } from "react-icons/md";
+import { PopUpDelete } from './PopUpDelete';
+import { useState } from 'react';
+
 
 interface ProductTableProps {
     products: Product[];
+    deleteProduct: (id: string | number) => Promise<void>;
+    refetch: () => Promise<void>;
 }
 
-export const ProductTable = ({ products }: ProductTableProps) => {
+export const ProductTable = ({ products, deleteProduct, refetch }: ProductTableProps) => {
     const navigate = useNavigate();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState<string>("undefined");
 
     const handleAddProduct = () => {
         navigate('/dashboard/products/create-product');
@@ -16,8 +24,14 @@ export const ProductTable = ({ products }: ProductTableProps) => {
         navigate(`/dashboard/products/${productId}`);
     };
 
+    const handleDeleteClick = (e: React.MouseEvent, productId: string) => {
+        e.stopPropagation();
+        setShowDeleteModal(true);
+        setSelectedProductId(productId);
+    };
+
     return (
-        <div className="overflow-x-auto rounded-lg shadow">
+        <div className="overflow-x-auto rounded-lg shadow relative">
             <div className="md:flex justify-end mb-4">
                 <button
                     className="md:flex bg-gray-800 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
@@ -34,28 +48,47 @@ export const ProductTable = ({ products }: ProductTableProps) => {
                         <th className="text-left px-4 py-2 border-b">Quantity</th>
                         <th className="text-left px-4 py-2 border-b">Price</th>
                         <th className="text-left px-4 py-2 border-b">Category</th>
-                        <th className="text-left px-4 py-2 border-b capitalize">Outlet</th>
+                        <th className="text-left px-4 py-2 border-b">Outlet</th>
+                        <th className="text-left px-4 py-2 border-b">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {products.map((product) => (
-                        <tr key={product.id}
-                            className="hover:bg-gray-50"
-                            onClick={() => handleRowClick(product.id)}>
-
-
+                        <tr
+                            key={product.id}
+                            className="hover:bg-gray-50 cursor-pointer"
+                            onClick={() => handleRowClick(product.id)}
+                        >
                             <td className="px-4 py-2 border-b">{product.id}</td>
                             <td className="px-4 py-2 border-b capitalize">{product.name}</td>
                             <td className="px-4 py-2 border-b">{product.quantity}</td>
-                            <td className="px-4 py-2 border-b">
-                                Rp {product.price.toLocaleString()}
-                            </td>
+                            <td className="px-4 py-2 border-b">Rp {product.price.toLocaleString()}</td>
                             <td className="px-4 py-2 border-b capitalize">{product.categoryName}</td>
-                            <td className="px-4 py-2 border-b capitalize">{product.outletName}</td>
+                            <td className="px-4 py-2 border-b capitalize ">{product.outletName}</td>
+                            <td className="px-4 py-2 border-b justify-center">
+                                <button
+                                    onClick={(e) => handleDeleteClick(e, product.id.toString())}
+                                    className="text-red-500 hover:text-red-700 justify-center flex items-center"
+                                >
+                                    <MdDeleteOutline className='w-6 h-6 ' />
+                                </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {/* Modal Delete */}
+            {showDeleteModal && (
+                <PopUpDelete
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={async () => {
+                        await deleteProduct(selectedProductId);
+                        await refetch();
+                        setShowDeleteModal(false);
+                    }}
+                />
+            )}
         </div>
     );
 };
