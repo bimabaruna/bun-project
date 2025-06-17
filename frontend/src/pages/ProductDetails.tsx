@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useCategory } from "../hooks/useCategory";
 import { useOutlets } from "../hooks/useOutlet";
 import { UploadImageInput } from "../components/UploadImageInput";
+import { CiImageOff } from "react-icons/ci";
 
 export default function ProductDetails() {
     const { id } = useParams();
@@ -20,7 +21,7 @@ export default function ProductDetails() {
     const [edit, setEdit] = useState(false);
     const [updatedAt, setCreatedAt] = useState<string | null>(null);
     const [updatedby, setUpdatedBy] = useState<string | null>(null);
-    const [imageUrl, setImageUrl] = useState<string>("");
+    const [imageUrl, setImageUrl] = useState<any>();
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     const navigate = useNavigate();
