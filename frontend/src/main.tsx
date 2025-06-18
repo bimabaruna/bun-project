@@ -8,6 +8,7 @@ import HomePage from './HomePage'
 import ProductList from './pages/ProductList'
 import CreateProduct from './pages/CreateProduct'
 import ProductDetails from './pages/ProductDetails'
+import OutletList from './pages/OutletList'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="products" element={<ProductList />} />
           <Route path="products/create-product" element={<CreateProduct />} />
           <Route path="products/:id" element={<ProductDetails />} />
+          <Route path="outlets" element={<OutletList />} />
         </Route>
       </Routes>
     </BrowserRouter>

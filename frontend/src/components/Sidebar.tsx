@@ -19,7 +19,7 @@ export default function Sidebar() {
       {/* Sidebar Toggle Button */}
       <button
         onClick={toggleCollapse}
-        className={`absolute top-4 transition-all duration-300 bg-gray-800 text-white p-2 rounded-full z-50 ${isCollapsed ? "left-4" : "left-64"
+        className={`absolute top-4 transition-all duration-500 bg-gray-800 text-white p-2 rounded-full z-50 ${isCollapsed ? "left-4" : "left-65"
           }`}
       >
         {isCollapsed ? <FaChevronRight className={`transition-transform duration-1000 ${isCollapsed ? "rotate-0" : "rotate-180"
@@ -55,7 +55,7 @@ export default function Sidebar() {
             <div className="w-6 h-6 flex items-center justify-center">
               <AiOutlineProduct
                 size={24}
-                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-180" : "rotate-0"
+                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-360" : "rotate-0"
                   }`}
               />
             </div>
@@ -77,7 +77,7 @@ export default function Sidebar() {
             <div className="w-6 h-6 flex items-center justify-center">
               <BiStore
                 size={24}
-                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-180" : "rotate-0"
+                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-360" : "rotate-0"
                   }`}
               />
             </div>
@@ -99,7 +99,7 @@ export default function Sidebar() {
             <div className="w-6 h-6 flex items-center justify-center">
               <MdOutlineCategory
                 size={24}
-                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-180" : "rotate-0"
+                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-360" : "rotate-0"
                   }`}
               />
             </div>
@@ -121,7 +121,7 @@ export default function Sidebar() {
             <div className="w-6 h-6 flex items-center justify-center">
               <FaUserCircle
                 size={24}
-                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-180" : "rotate-0"
+                className={`mt-4 transition-transform duration-500 ${isCollapsed ? "rotate-360" : "rotate-0"
                   }`}
               />
             </div>

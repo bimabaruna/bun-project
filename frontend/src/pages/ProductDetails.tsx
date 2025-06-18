@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useCategory } from "../hooks/useCategory";
 import { useOutlets } from "../hooks/useOutlet";
 import { UploadImageInput } from "../components/UploadImageInput";
-import { CiImageOff } from "react-icons/ci";
 
 export default function ProductDetails() {
     const { id } = useParams();

@@ -30,5 +30,5 @@ export const useOutlets = () => {
         fetchOutlets();
     }, []);
 
-    return { outlets, loading };
+    return { outlets, loading, isEmpty: outlets.length === 0, };
 };
