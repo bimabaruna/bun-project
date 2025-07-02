@@ -34,3 +34,9 @@ export interface Outlet {
 export interface OutletResponse {
   data: Outlet[];
 }
+
+export interface OutletRequest {
+  outletName: string,
+  outletAddress: string,
+  phone: number
+}

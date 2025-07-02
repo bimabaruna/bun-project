@@ -17,7 +17,7 @@ export const OutletTable = ({ outlet }: OutletTable) => {
     const [selectedOutletId, setSeletedOutletId] = useState<string>("undefined");
 
     const handleAddProduct = () => {
-        navigate('/dashboard/outlets/create-product');
+        navigate('/dashboard/outlets/create-outlet');
     };
 
     const handleRowClick = (outletId: string | number) => {

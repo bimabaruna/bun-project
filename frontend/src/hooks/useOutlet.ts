@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react";
-import { Outlet, OutletResponse } from "../model/types";
+import { Outlet, OutletResponse, OutletRequest } from "../model/types";
+import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
 
 export const useOutlets = () => {
     const [outlets, setOutlets] = useState<Outlet[]>([]);
     const [loading, setLoading] = useState(true);
+    const token = localStorage.getItem('token');
+    const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate()
+
+
 
     useEffect(() => {
         const fetchOutlets = async () => {
             setLoading(true);
             try {
-                const token = localStorage.getItem("token");
+
                 const response = await fetch("/api/outlets", {
                     headers: {
                         Authorization: token || "",
@@ -30,5 +38,5 @@ export const useOutlets = () => {
         fetchOutlets();
     }, []);
 
-    return { outlets, loading, isEmpty: outlets.length === 0, };
+    return { outlets, loading, isEmpty: outlets.length === 0 };
 };
