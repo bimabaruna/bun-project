@@ -34,3 +34,10 @@ outletController.get('/outlets', authMiddleware, async (c) => {
 
     return c.json(response)
 })
+
+outletController.delete('/outlets/:id', authMiddleware, async (c) => {
+    const outletId = c.req.param('id')
+
+    const response = await OutletService.delete(Number(outletId))
+    return c.json(response)
+})
