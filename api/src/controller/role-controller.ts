@@ -22,3 +22,10 @@ roleController.get('/roles', authMiddleware, async (c) => {
 
     return c.json(response)
 })
+
+roleController.delete('/roles/:id', authMiddleware, async (c) => {
+    const roleId = c.req.param('id')
+
+    const response = await RoleService.delete(Number(roleId))
+    return c.json(response)
+})
