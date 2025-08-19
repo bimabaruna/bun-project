@@ -46,3 +46,14 @@ orderController.post('/order/:id/cancel', authMiddleware, async (c) => {
     })
 
 })
+
+orderController.get('/order', authMiddleware, async (c) => {
+    const { page, size, startDate, endDate } = c.req.query();
+
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const sizeNumber = size ? parseInt(size, 10) : 10;
+
+    const response = await OrderService.getList(pageNumber, sizeNumber, startDate, endDate);
+
+    return c.json(response);
+});

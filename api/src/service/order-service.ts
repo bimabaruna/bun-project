@@ -1,13 +1,13 @@
-import type { User, Employee } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { prismaClient } from "../application/database";
 import { HTTPException } from "hono/http-exception";
-import { toOrderResponse, type CreateOrderRequest, type OrderResponse } from "../model/order-model";
+import { toOrderResponse, type CreateOrderRequest, type OrderListResponse, type OrderResponse } from "../model/order-model";
 import type { Decimal } from "@prisma/client/runtime/library";
 import { orderValidation } from "../validation/order-validation";
 
 export class OrderService {
 
-    static async create(employee: Employee, request: CreateOrderRequest): Promise<OrderResponse> {
+    static async create(user: User, request: CreateOrderRequest): Promise<OrderResponse> {
 
         request = orderValidation.CREATE.parse(request);
 
@@ -55,7 +55,7 @@ export class OrderService {
             // Create order
             const order = await prisma.order.create({
                 data: {
-                    cashier_id: employee.id,
+                    cashier_id: user.id,
                     total_price: totalPrice,
                     status: "on_progress",
                     order_items: {
@@ -97,7 +97,7 @@ export class OrderService {
 
         return {
             id: Number(order.id),
-            customer_id: user.id,
+            cashier_id: user.id,
             total_price: order.total_price,
             status: order.status,
             items: order.order_items.map(item => ({
@@ -169,5 +169,52 @@ export class OrderService {
             id: order.id,
             message: "Order are Canceled"
         }
+    }
+
+    static async getList(page: number, size: number, startDate?: string, endDate?: string): Promise<
+        OrderListResponse> {
+
+        const pageNumber = Math.max(1, page);
+        const skip = (pageNumber - 1) * size;
+
+        const where: any = {};
+        if (startDate || endDate) {
+            where.created_at = {};
+            if (startDate) {
+                where.created_at.gte = new Date(startDate);
+            }
+            if (endDate) {
+                where.created_at.lte = new Date(endDate);
+            }
+        }
+
+        const [orders, totalCount] = await Promise.all([
+            prismaClient.order.findMany({
+                where,
+                skip,
+                take: size,
+                include: {
+                    order_items: {
+                        include: {
+                            product: true
+                        }
+                    }
+                },
+                orderBy: {
+                    order_date: 'desc'
+                }
+            }),
+            prismaClient.order.count({ where })
+        ]);
+
+        const mappedOrders = orders.map(order => toOrderResponse(order));
+
+        return {
+            page: pageNumber,
+            size: size,
+            totalOrder: totalCount,
+            lastPage: Math.ceil(totalCount / size),
+            data: mappedOrders
+        };
     }
 }

@@ -36,7 +36,7 @@ export class ProductService {
         return toProductResponse(product, product.product_category)
     }
 
-    static async getList(page: number, size: number, product_name?: string, outlet_id?: number): Promise<ProductListResponse> {
+    static async getList(page: number, size: number, product_name?: string, outlet_id?: number, category_id?: number): Promise<ProductListResponse> {
 
         const pageNumber = Math.max(1, page)
         const skip = (pageNumber - 1) * size
@@ -52,6 +52,9 @@ export class ProductService {
                 }),
                 ...(outlet_id && {
                     outlet_id: outlet_id,
+                }),
+                ...(category_id && {
+                    category_id: category_id
                 })
             },
             include: {

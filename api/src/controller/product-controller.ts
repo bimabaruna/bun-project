@@ -24,13 +24,20 @@ productController.post('/products', authMiddleware, async (c) => {
 
 productController.get('/products', authMiddleware, async (c) => {
 
-    const size = Number(c.req.query('size'))
-    const page = Number(c.req.query('page'))
-    const product_name = c.req.query('productName')
-    const outletId = Number(c.req.query('outletId'))
+    const page = Number(c.req.query('page') || 1);
+    const size = Number(c.req.query('size') || 10);
+    const product_name = c.req.query('productName');
+    const outletId = Number(c.req.query('outletId') || undefined);
+    const categoryId = Number(c.req.query('categoryId') || undefined);
 
-    const response = await ProductService.getList(page, size, product_name, outletId)
-    console.log(response);
+    const response = await ProductService.getList(
+        page,
+        size,
+        product_name,
+        isNaN(outletId) ? undefined : outletId,
+        isNaN(categoryId) ? undefined : categoryId
+    );
+    
     return c.json(response)
 })
 
@@ -65,11 +72,11 @@ productController.delete('/products/:id', authMiddleware, async (c) => {
     )
 })
 
-productController.post('/v2/products', authMiddleware, async (c)=>{
+productController.post('/v2/products', authMiddleware, async (c) => {
     const user = c.get('user') as User;
-    
+
     try {
-       
+
         const formData = await c.req.formData();
 
         const image = formData.get('image');
@@ -81,7 +88,7 @@ productController.post('/v2/products', authMiddleware, async (c)=>{
             console.warn("Received 'image' field, but it was not a standard File object.");
         }
 
-        const dataString = formData.get('data'); 
+        const dataString = formData.get('data');
         if (!dataString || typeof dataString !== 'string') {
             c.status(400);
             return c.json({ error: "Missing or invalid 'data' field. Expected a JSON string." });
@@ -101,7 +108,7 @@ productController.post('/v2/products', authMiddleware, async (c)=>{
             c.status(400);
             return c.json({ error: "Validation failed for data field", details: messages });
         }
-        const validatedData = validationResult.data; 
+        const validatedData = validationResult.data;
         const { File: FormDataNodeFile } = await import('formdata-node');
         const convertedImageFile = imageFile ? new FormDataNodeFile([imageFile], imageFile.name, { type: imageFile.type }) : null;
         const response = await ProductService.createV2(user, validatedData, convertedImageFile);
@@ -112,14 +119,14 @@ productController.post('/v2/products', authMiddleware, async (c)=>{
 
     } catch (error: any) {
         console.error("Error in POST /products:", error);
-        
+
         if (error.message?.includes("Upload failed") || error.message?.includes("Storage service not available")) {
-             c.status(500); // Or 400 Bad Request if file format was wrong?
-             return c.json({ error: "Image processing failed.", detail: error.message });
+            c.status(500); // Or 400 Bad Request if file format was wrong?
+            return c.json({ error: "Image processing failed.", detail: error.message });
         }
         if (error.message?.includes("Failed to save product")) {
-             c.status(500);
-             return c.json({ error: "Database operation failed.", detail: error.message });
+            c.status(500);
+            return c.json({ error: "Database operation failed.", detail: error.message });
         }
 
         // Generic fallback error
