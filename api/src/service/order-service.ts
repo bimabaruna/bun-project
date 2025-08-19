@@ -179,12 +179,12 @@ export class OrderService {
 
         const where: any = {};
         if (startDate || endDate) {
-            where.created_at = {};
+            where.order_date = {};
             if (startDate) {
-                where.created_at.gte = new Date(startDate);
+                where.order_date.gte = new Date(startDate);
             }
             if (endDate) {
-                where.created_at.lte = new Date(endDate);
+                where.order_date.lte = new Date(endDate);
             }
         }
 
