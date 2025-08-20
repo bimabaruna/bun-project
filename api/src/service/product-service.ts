@@ -325,41 +325,208 @@ export class ProductService {
         });
     }
 
-    static async createV2(
-        user: User,
-        data: ValidatedProductData, // zod
-        imageFile: File | null
-    ): Promise<ProductResponse> {
+    static async createV2(user: User, request: CreateProductRequest): Promise<ProductResponse> {
+        const createRequest = productValidation.CREATE.parse(request);
 
-        let imageUrl: string | null = null;
-        if (imageFile) {
-            try {
-                imageUrl = await ProductService._uploadImageToGCS(imageFile);
-            } catch (uploadError) {
-                console.error("Product creation failed due to image upload error:", uploadError);
-                throw new Error("Image upload failed, product not created.");
+        // 1. Create the product and its initial stock movement log.
+        // We don't include relations here to avoid the type inference issue.
+        const newProduct = await prismaClient.product.create({
+            data: {
+                name: createRequest.name,
+                price: createRequest.price,
+                quantity: createRequest.quantity,
+                created_by: user.username, // Assumes you want the username string
+                category_id: createRequest.categoryId,
+                image_url: createRequest.imageUrl,
+                outlet_id: createRequest.outletId,
+                stock_movements: {
+                    create: {
+                        user_id: user.id,
+                        quantity_changed: createRequest.quantity, // The initial amount
+                        new_quantity: createRequest.quantity,     // The new total is the initial amount
+                        type: 'INITIAL_STOCK',
+                        notes: 'Product created in system.'
+                    }
+                }
             }
-        }
-        try {
-            const product = await prismaClient.product.create({
+        });
+
+        // 2. Fetch the complete product record with relations.
+        // This ensures TypeScript correctly infers the types of `product_category` and `outlet`.
+        const finalProduct = await prismaClient.product.findUniqueOrThrow({
+            where: { id: newProduct.id },
+            include: {
+                product_category: true,
+                outlet: true
+            }
+        });
+
+        return toProductResponse(finalProduct, finalProduct.product_category, finalProduct.outlet);
+    }
+
+    /**
+     * Updates a product's details. If the quantity is changed, it logs a stock adjustment.
+     * This is wrapped in a transaction to ensure data integrity.
+     */
+    static async updateV2(product_id: string, request: UpdateProductRequest, user: User): Promise<ProductResponse> {
+        const updateRequest = productValidation.UPDATE.parse(request);
+        const productIdNumber = Number(product_id);
+
+        // The transaction will handle the update and return the ID of the updated product.
+        const updatedProductId = await prismaClient.$transaction(async (prisma) => {
+            // 1. Fetch the current state of the product
+            const currentProduct = await prisma.product.findUnique({
+                where: { id: productIdNumber }
+            });
+
+            if (!currentProduct) {
+                throw new HTTPException(404, { message: "Product Not Found" });
+            }
+            if (currentProduct.is_deleted) {
+                throw new HTTPException(400, { message: "Cannot update a deleted product" });
+            }
+
+            // 2. Handle image deletion if a new image is provided or if it's explicitly removed
+            if (currentProduct.image_url && (updateRequest.imageUrl || updateRequest.imageUrl === null)) {
+                const fileName = currentProduct.image_url.split("/").pop();
+                if (fileName) {
+                    const file = bucket.file(`products/${fileName}`);
+                    const [exists] = await file.exists();
+                    if (exists) {
+                        await file.delete().catch(error => {
+                            console.error("Error deleting old file from GCS:", error);
+                        });
+                    }
+                }
+            }
+
+            // 3. Determine if stock quantity has changed and prepare stock movement data
+            let stockMovementData: any = undefined;
+            if (updateRequest.quantity !== undefined && updateRequest.quantity !== currentProduct.quantity) {
+                const quantityChange = updateRequest.quantity - currentProduct.quantity;
+                stockMovementData = {
+                    user_id: user.id,
+                    quantity_changed: quantityChange,
+                    new_quantity: updateRequest.quantity,
+                    type: quantityChange > 0 ? 'ADJUSTMENT_INCREASE' : 'ADJUSTMENT_DECREASE',
+                    notes: 'Manual stock update by admin.'
+                };
+            }
+
+            // 4. Update the product and create stock movement log if necessary
+            const updatedProduct = await prisma.product.update({
+                where: { id: productIdNumber },
                 data: {
-                    name: data.name,
-                    price: data.price,
-                    quantity: data.quantity,
-                    created_by: user.username,
-                    category_id: data.categoryId,
-                    image_url: imageUrl
-                },
-                include: {
-                    product_category: true
+                    name: updateRequest.name,
+                    price: updateRequest.price,
+                    quantity: updateRequest.quantity,
+                    updated_by: user.username,
+                    category_id: updateRequest.categoryId,
+                    image_url: updateRequest.imageUrl,
+                    outlet_id: updateRequest.outletId,
+                    stock_movements: stockMovementData ? { create: stockMovementData } : undefined
                 }
             });
 
-            return toProductResponse(product, product.product_category);
+            return updatedProduct.id;
+        });
 
-        } catch (dbError) {
-            console.error("Database error during product creation:", dbError);
-            throw new Error("Failed to save product to database.");
-        }
+        // 5. After the transaction is successful, fetch the final product with all relations.
+        // This ensures TypeScript has the correct type information.
+        const finalProduct = await prismaClient.product.findUniqueOrThrow({
+            where: { id: updatedProductId },
+            include: {
+                product_category: true,
+                outlet: true
+            }
+        });
+
+        return toProductResponse(finalProduct, finalProduct.product_category, finalProduct.outlet);
     }
+
+    /**
+     * Soft-deletes a product. This action does not create a stock movement.
+     * The stock quantity remains for historical reporting purposes.
+     */
+    static async deleteV2(user: User, product_id: number): Promise<{ message: string }> {
+        const productIdNumber = productValidation.DELETE.parse(product_id);
+
+        const product = await prismaClient.product.findUnique({
+            where: { id: productIdNumber }
+        });
+
+        if (!product) {
+            throw new HTTPException(404, { message: "Product Not Found" });
+        }
+        if (product.is_deleted) {
+            throw new HTTPException(400, { message: "Product already deleted" });
+        }
+
+        // Handle GCS image deletion
+        if (product.image_url) {
+            const fileName = product.image_url.split("/").pop();
+            if (fileName) {
+                const file = bucket.file(`products/${fileName}`);
+                const [exists] = await file.exists();
+                if (exists) {
+                    await file.delete().catch(error => console.error("Error deleting file from GCS on soft delete:", error));
+                }
+            }
+        }
+
+        await prismaClient.product.update({
+            where: { id: productIdNumber },
+            data: {
+                is_deleted: true,
+                deleted_at: new Date(),
+                deleted_by: user.username,
+                image_url: null // Clear the image URL on delete
+            }
+        });
+
+        return {
+            message: 'Successfully deleted the product.'
+        };
+    }
+
+    // this function is not used in the current code, but it can be used to create a product with an image
+    // static async createV2(
+    //     user: User,
+    //     data: ValidatedProductData, // zod
+    //     imageFile: File | null
+    // ): Promise<ProductResponse> {
+
+    //     let imageUrl: string | null = null;
+    //     if (imageFile) {
+    //         try {
+    //             imageUrl = await ProductService._uploadImageToGCS(imageFile);
+    //         } catch (uploadError) {
+    //             console.error("Product creation failed due to image upload error:", uploadError);
+    //             throw new Error("Image upload failed, product not created.");
+    //         }
+    //     }
+    //     try {
+    //         const product = await prismaClient.product.create({
+    //             data: {
+    //                 name: data.name,
+    //                 price: data.price,
+    //                 quantity: data.quantity,
+    //                 created_by: user.username,
+    //                 category_id: data.categoryId,
+    //                 image_url: imageUrl
+    //             },
+    //             include: {
+    //                 product_category: true
+    //             }
+    //         });
+
+    //         return toProductResponse(product, product.product_category);
+
+    //     } catch (dbError) {
+    //         console.error("Database error during product creation:", dbError);
+    //         throw new Error("Failed to save product to database.");
+    //     }
+    // }
+
+
 }

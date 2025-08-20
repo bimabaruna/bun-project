@@ -24,8 +24,9 @@ model User {
   contacts Contact[]
   orders   Order[]
 
-  user_details EmployeeDetails? @relation("UserEmployeeDetails")
-  role         Role?            @relation(fields: [role_id], references: [id])
+  user_details    EmployeeDetails? @relation("UserEmployeeDetails")
+  role            Role?            @relation(fields: [role_id], references: [id])
+  stock_movements StockMovement[]
 
   @@map("users")
 }
@@ -136,6 +137,7 @@ model Product {
   order_items      OrderItem[]
   outlet           Outlet?          @relation(fields: [outlet_id], references: [id])
   product_category ProductCategory? @relation(fields: [category_id], references: [id])
+  stock_movements  StockMovement[]
 
   @@map("products")
 }
@@ -147,8 +149,9 @@ model Order {
   total_price Decimal  @db.Decimal(10, 2)
   status      String   @default("on_progress")
 
-  order_items OrderItem[]
-  payments    Payment[]
+  order_items     OrderItem[]
+  payments        Payment[]
+  stock_movements StockMovement[]
 
   user User @relation(fields: [cashier_id], references: [id])
 
@@ -217,4 +220,32 @@ enum Orderstatus {
   on_progress
   completed
   cancelled
+}
+
+model StockMovement {
+  id               Int               @id @default(autoincrement())
+  product_id       Int
+  user_id          Int // The employee (User) who initiated the movement
+  order_id         Int? // Optional: Link to the Order if it's a SALE or CUSTOMER_RETURN
+  quantity_changed Int // e.g., -2 for a sale, +50 for stock-in
+  new_quantity     Int // The quantity of the product AFTER this movement
+  type             StockMovementType
+  notes            String? // Important for manual adjustments
+  created_at       DateTime          @default(now())
+
+  // Relations
+  product Product @relation(fields: [product_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+  order   Order?  @relation(fields: [order_id], references: [id])
+
+  @@map("stock_movements")
+}
+
+enum StockMovementType {
+  SALE // When a product is sold via an Order
+  SUPPLIER_STOCK_IN // Receiving new stock from a supplier
+  ADJUSTMENT_INCREASE // Manual count correction, finding extra stock
+  ADJUSTMENT_DECREASE // Manual count correction, spoilage, damage, theft
+  CUSTOMER_RETURN // Customer returns a product
+  INITIAL_STOCK // Setting the initial quantity for a new product
 }

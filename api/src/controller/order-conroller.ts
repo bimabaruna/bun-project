@@ -57,3 +57,27 @@ orderController.get('/order', authMiddleware, async (c) => {
 
     return c.json(response);
 });
+
+orderController.post('/v2/order', authMiddleware, async (c) => {
+    const user = c.get('user') as User
+    const request = await c.req.json() as CreateOrderRequest
+
+    const response = await OrderService.createV2(user, request)
+
+    return c.json({
+        data: response
+    })
+})
+
+orderController.post('/v2/order/:id/cancel', authMiddleware, async (c) => {
+
+    const user = c.get('user') as User
+    const request = Number(c.req.param('id'))
+
+    const response = await OrderService.cancelV2(user, request)
+
+    return c.json({
+        data: response
+    })
+
+})
