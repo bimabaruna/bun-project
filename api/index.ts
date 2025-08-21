@@ -15,6 +15,7 @@ import { uploadController } from "./src/controller/upload-controller";
 import { outletController } from "./src/controller/outlet-controller";
 import { employeeController } from "./src/controller/empoylee-controller";
 import { stockMovementController } from "./src/controller/stock-movements-controller";
+import { reportingController } from "./src/controller/reporting-controller";
 
 const app = new Hono()
 
@@ -46,6 +47,7 @@ app.route('/api', uploadController)
 app.route('/api', outletController)
 app.route('/api', employeeController)
 app.route('/api', stockMovementController)
+app.route('/api', reportingController)
 
 app.use('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
