@@ -62,14 +62,14 @@ userController.patch('/users/user', authMiddleware, async (c) => {
     })
 })
 
-userController.delete('/users/user', authMiddleware, async (c) => {
-    const user = c.get('user') as User
+// userController.delete('/users/user', authMiddleware, async (c) => {
+//     const user = c.get('user') as User
 
-    const response = await UserService.logout(user)
-    return c.json({
-        data: response
-    })
-})
+//     const response = await UserService.logout(user)
+//     return c.json({
+//         data: response
+//     })
+// })
 
 userController.delete('/users', authMiddleware, async (c) => {
     const idParam = c.req.query('id');

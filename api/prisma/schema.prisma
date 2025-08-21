@@ -14,12 +14,11 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
+  id       Int    @id @default(autoincrement())
+  username String @unique
   password String
   name     String
   role_id  Int?
-  token    String?
 
   contacts Contact[]
   orders   Order[]

@@ -79,48 +79,37 @@ export class UserService {
                 message: "Username or password is wrong!"
             })
         }
-
+        const expiresIn = 60; // 1 hour in seconds
         const token = await sign(
-            { id: user.id, username: user.username },
-            JWT_SECRET
+            { id: user.id, username: user.username, exp: Math.floor(Date.now() / 1000) + expiresIn },
+            JWT_SECRET,
+            "HS256"
         )
 
-        const userLogin = await prismaClient.user.update({
-            where: {
-                username: request.username
-            },
-            data: {
-                token: token
-            }, include: {
-                role: true
-            }
-        })
+        const response = toUserResponse(user)
 
-        const response = toUserResponse(user, userLogin.role)
-
-        response.token = userLogin.token!;
+        response.token = token;
         return response
     }
 
-    // get user token fir nuddkeware
-    static async get(token: string | undefined | null): Promise<User> {
+    // static async get(token: string | undefined | null): Promise<User> {
 
-        token = UserValidation.TOKEN.parse(token)
+    //     token = UserValidation.TOKEN.parse(token)
 
-        const user = await prismaClient.user.findFirst({
-            where: {
-                token: token
-            }
-        })
+    //     const user = await prismaClient.user.findFirst({
+    //         where: {
+    //             token: token
+    //         }
+    //     })
 
-        if (!user) {
-            throw new HTTPException(401, {
-                message: 'Unathorized'
-            })
-        }
+    //     if (!user) {
+    //         throw new HTTPException(401, {
+    //             message: 'Unathorized'
+    //         })
+    //     }
 
-        return user
-    }
+    //     return user
+    // }
 
     static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
         const result = UserValidation.UPDATE.safeParse(request)
@@ -158,20 +147,20 @@ export class UserService {
         return toUserResponse(user, updatedUser.role)
     }
 
-    static async logout(user: User): Promise<boolean> {
+    // static async logout(user: User): Promise<boolean> {
 
-        await prismaClient.user.update({
-            where: {
-                username: user.username
-            },
-            data: {
-                token: null
-            }
-        })
+    //     await prismaClient.user.update({
+    //         where: {
+    //             username: user.username
+    //         },
+    //         data: {
+    //             token: null
+    //         }
+    //     })
 
-        return true
+    //     return true
 
-    }
+    // }
 
     static async getList(page: number, size: number, username?: string): Promise<UserListResponse> {
 
@@ -200,7 +189,7 @@ export class UserService {
         })
         ])
 
-        const transformedUsers = userList.map((user) => 
+        const transformedUsers = userList.map((user) =>
             toUserResponse(user, user.role)
         );
 
@@ -281,6 +270,13 @@ export class UserService {
             })
         }
 
+        if (request.password) {
+            request.password = await Bun.password.hash(request.password, {
+                algorithm: 'bcrypt',
+                cost: 10
+            })
+        }
+
         user = await prismaClient.user.update({
             where: {
                 id: id
@@ -288,6 +284,8 @@ export class UserService {
                 name: request.name,
                 password: request.password,
                 role_id: request.roleId
+            }, include: {
+                role: true,
             }
         })
 
