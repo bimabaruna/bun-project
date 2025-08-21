@@ -63,6 +63,12 @@ export class ProductService {
             },
             skip,
             take: size,
+            orderBy: [{
+                created_at: 'desc',
+            },
+            {
+                name: 'asc'
+            }],
         }), prismaClient.product.count({
             where: {
                 is_deleted: false,
