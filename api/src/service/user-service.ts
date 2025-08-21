@@ -79,7 +79,7 @@ export class UserService {
                 message: "Username or password is wrong!"
             })
         }
-        const expiresIn = 60; // 1 hour in seconds
+        const expiresIn = 60 * 60; // 1 hour in seconds
         const token = await sign(
             { id: user.id, username: user.username, exp: Math.floor(Date.now() / 1000) + expiresIn },
             JWT_SECRET,
@@ -138,7 +138,11 @@ export class UserService {
             where: {
                 id: user.id
             },
-            data: user,
+            data: {
+                name: user.name,
+                password: user.password,
+                role_id: user.role_id
+            },
             include: {
                 role: true
             }

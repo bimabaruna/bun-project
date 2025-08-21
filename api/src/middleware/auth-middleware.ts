@@ -4,8 +4,7 @@ import { verify } from "hono/jwt";
 import { HTTPException } from "hono/http-exception";
 import { prismaClient } from "../application/database"; // Adjust the path if needed
 
-// Define your JWT secret here or import it from your config/environment
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET || 'JWT_SECRET';
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
     const token = c.req.header('Authorization');
