@@ -8,33 +8,33 @@ import { toPaymentResponse, type PaymentRequest, type PaymentResponse } from '..
 import { paymentValidation } from '../validation/payment-validation';
 
 export class PaymentService {
-    
-    static async create(user: User, request:PaymentRequest): Promise<PaymentResponse>{
+
+    static async create(user: User, request: PaymentRequest): Promise<PaymentResponse> {
 
         request = paymentValidation.CREATE.parse(request)
 
         const order = await prismaClient.order.findFirst({
-            where:{
+            where: {
                 id: request.order_id
             }
         })
 
-        if(!order){
-            throw new HTTPException(400,{
+        if (!order) {
+            throw new HTTPException(400, {
                 message: `order id ${request.order_id} not found`
             })
         }
 
         const paidableStatuses = ["on_progress"];
 
-        if (!paidableStatuses.includes(order.status)){
-            throw new HTTPException(400,{
+        if (!paidableStatuses.includes(order.status)) {
+            throw new HTTPException(400, {
                 message: `Order cannot be paid in its current status: ${order.status}`
             })
         }
 
         const payment = await prismaClient.payment.create({
-            data:{
+            data: {
                 order_id: request.order_id,
                 amount: request.amount,
                 method: request.method
@@ -44,7 +44,7 @@ export class PaymentService {
         await prismaClient.order.update({
             where: {
                 id: request.order_id
-            }, data:{
+            }, data: {
                 status: "paid"
             }
         })

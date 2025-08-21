@@ -9,11 +9,17 @@ export type PaymentResponse = {
 export type PaymentRequest = {
     order_id: number,
     amount: Decimal,
-    method: string
+    method: PaymentMethod
 }
 
-export function toPaymentResponse(payment: Payment){
-    return{
+export enum PaymentMethod {
+    PAYMENT_METHOD_CASH = "cash",
+    PAYMENT_METHOD_TRANSFER = "transfer",
+    PAYMENT_METHOD_CREDIT_CARD = "credit_card"
+}
+
+export function toPaymentResponse(payment: Payment) {
+    return {
         id: payment.id
     }
 }
