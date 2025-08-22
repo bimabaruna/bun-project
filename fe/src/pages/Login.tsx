@@ -34,13 +34,13 @@ const LoginPage = () => {
             <Input
               type="text"
               placeholder="Username"
-              value={username}
+              value={username.toLowerCase()}
               onChange={(e) => setUsername(e.target.value)}
             />
             <Input
               type="password"
               placeholder="Password"
-              value={password}
+              value={password.toLowerCase()}
               onChange={(e) => setPassword(e.target.value)}
             />
             {error && <p className="text-red-500 text-sm">{error}</p>}
