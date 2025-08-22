@@ -49,8 +49,8 @@ app.route('/api', employeeController)
 app.route('/api', stockMovementController)
 app.route('/api', reportingController)
 
-app.use('*', serveStatic({ root: './frontend/dist' }));
-app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
+app.use('*', serveStatic({ root: './fe/dist' }));
+app.get('*', serveStatic({ path: './fe/dist/index.html' }))
 
 app.onError(async (err, c) => {
     if (err instanceof HTTPException) {

@@ -35,8 +35,8 @@ COPY api ./api
 # COPY frontend/dist ./frontend/dist
 
 # ---------- Build Frontend ----------
-COPY frontend ./frontend
-WORKDIR /app/frontend
+COPY fe ./fe
+WORKDIR /app/fe
 RUN bun install --no-save
 RUN bun run build
 
