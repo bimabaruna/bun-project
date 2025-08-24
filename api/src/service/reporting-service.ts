@@ -12,10 +12,10 @@ export class ReportingService {
     ): Promise<{ date: string; orderCount: number }[]> {
         try {
             const startDate = new Date(range.startDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
 
             const endDate = new Date(range.endDate);
-            endDate.setUTCHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999);
 
             const dailyOrders = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -59,10 +59,10 @@ export class ReportingService {
     static async getMostSoldProducts(range: DateRange, limit: number = 10): Promise<{ productId: number; productName: string; totalQuantitySold: number }[]> {
         try {
             const startDate = new Date(range.startDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
 
             const endDate = new Date(range.endDate);
-            endDate.setUTCHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999);
             // We need to group the OrderItem table and sum the quantities.
             const topProducts = await prismaClient.orderItem.groupBy({
                 by: ['product_id'],
@@ -135,10 +135,10 @@ export class ReportingService {
     static async getRevenuePerDay(range: DateRange): Promise<{ date: string; totalRevenue: number }[]> {
         try {
             const startDate = new Date(range.startDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
 
             const endDate = new Date(range.endDate);
-            endDate.setUTCHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999);
 
             const dailyRevenue = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -185,10 +185,10 @@ export class ReportingService {
     static async getSalesByCashier(range: DateRange, limit: number = 10): Promise<{ cashierId: number; cashierName: string; totalRevenue: number; totalOrders: number }[]> {
         try {
             const startDate = new Date(range.startDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
 
             const endDate = new Date(range.endDate);
-            endDate.setUTCHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999);
 
             const cashierPerformance = await prismaClient.order.groupBy({
                 by: ['cashier_id'],
@@ -246,10 +246,10 @@ export class ReportingService {
     ): Promise<{ date: string; orderCount: number }[]> {
         try {
             const startDate = new Date(range.startDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
 
             const endDate = new Date(range.endDate);
-            endDate.setUTCHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999);
 
             const dailyOrders = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -297,10 +297,10 @@ export class ReportingService {
     ): Promise<{ date: string; totalRevenue: number }[]> {
         try {
             const startDate = new Date(range.startDate);
-            startDate.setUTCHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
 
             const endDate = new Date(range.endDate);
-            endDate.setUTCHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999);
 
             const dailyRevenue = await prismaClient.order.groupBy({
                 by: ['order_date'],

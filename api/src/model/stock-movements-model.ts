@@ -1,5 +1,13 @@
 import type { Order, Product, StockMovement, User } from "@prisma/client";
 
+
+export type stockMovementListResponse = {
+    page: number;
+    size: number;
+    totalCount: number;
+    lastPage: number;
+    data: StockMovementResponse[];
+}
 export type StockMovementResponse = {
     id: number;
     productId: number;
@@ -14,6 +22,7 @@ export type StockMovementResponse = {
     note?: string | null;
     createdAt: Date;
 }
+
 
 
 

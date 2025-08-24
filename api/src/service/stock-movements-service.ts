@@ -1,12 +1,13 @@
 import { prismaClient } from "../application/database";
-import type { StockMovementResponse } from "../model/stock-movements-model";
+import type { StockMovementResponse, stockMovementListResponse } from "../model/stock-movements-model";
 
 export class StockMovementsService {
 
-    static async getList(page: number, size: number, order_id?: number, product_name?: string): Promise<StockMovementResponse[]> {
+    static async getList(page: number, size: number, order_id?: number, product_name?: string): Promise<stockMovementListResponse> {
         const pageNumber = Math.max(1, page)
         const skip = (pageNumber - 1) * size
-        const stockMovements = await prismaClient.stockMovement.findMany({
+
+        const [stockMovements, totalCount] = await Promise.all([prismaClient.stockMovement.findMany({
             where: {
                 ...(product_name && {
                     product: {
@@ -19,6 +20,8 @@ export class StockMovementsService {
                 ...(order_id && {
                     order_id: order_id
                 })
+            }, orderBy: {
+                created_at: 'desc'
             },
             include: {
                 product: true,
@@ -27,8 +30,22 @@ export class StockMovementsService {
             },
             skip,
             take: size
+        }), prismaClient.stockMovement.count({
+            where: {
+                ...(product_name && {
+                    product: {
+                        name: {
+                            contains: product_name,
+                            mode: 'insensitive'
+                        }
+                    },
+                }),
+                ...(order_id && {
+                    order_id: order_id
+                })
+            }
         })
-
+        ]);
         const mapped = stockMovements.map((movement) => {
             return {
                 id: movement.id,
@@ -44,7 +61,13 @@ export class StockMovementsService {
                 createdAt: movement.created_at,
             }
         })
-        return mapped
+        return {
+            page: pageNumber,
+            size,
+            totalCount,
+            lastPage: Math.ceil(totalCount / size),
+            data: mapped
+        }
     }
 
 }
