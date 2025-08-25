@@ -11,11 +11,8 @@ export class ReportingService {
 
     ): Promise<{ date: string; orderCount: number }[]> {
         try {
-            const startDate = new Date(range.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(range.endDate);
-            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(`${range.startDate}T00:00:00.000Z`);
+            const endDate = new Date(`${range.endDate}T23:59:59.999Z`);
 
             const dailyOrders = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -33,7 +30,7 @@ export class ReportingService {
             const orderMap: Record<string, number> = {};
 
             dailyOrders.forEach(day => {
-                const dateKey = (day.order_date ?? new Date(0)).toISOString().slice(0, 10);
+                const dateKey = (day.order_date ?? new Date(0)).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                 orderMap[dateKey] = (orderMap[dateKey] ?? 0) + day._count.id;
             });
 
@@ -58,11 +55,8 @@ export class ReportingService {
      */
     static async getMostSoldProducts(range: DateRange, limit: number = 10): Promise<{ productId: number; productName: string; totalQuantitySold: number }[]> {
         try {
-            const startDate = new Date(range.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(range.endDate);
-            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(`${range.startDate}T00:00:00.000Z`);
+            const endDate = new Date(`${range.endDate}T23:59:59.999Z`);
             // We need to group the OrderItem table and sum the quantities.
             const topProducts = await prismaClient.orderItem.groupBy({
                 by: ['product_id'],
@@ -134,11 +128,8 @@ export class ReportingService {
      */
     static async getRevenuePerDay(range: DateRange): Promise<{ date: string; totalRevenue: number }[]> {
         try {
-            const startDate = new Date(range.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(range.endDate);
-            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(`${range.startDate}T00:00:00.000Z`);
+            const endDate = new Date(`${range.endDate}T23:59:59.999Z`);
 
             const dailyRevenue = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -160,7 +151,7 @@ export class ReportingService {
             const revenueMap: Record<string, number> = {};
 
             dailyRevenue.forEach(day => {
-                const dateKey = (day.order_date ?? new Date(0)).toISOString().slice(0, 10);
+                const dateKey = (day.order_date ?? new Date(0)).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                 revenueMap[dateKey] = (revenueMap[dateKey] ?? 0) + (day._sum.total_price?.toNumber() || 0);
             });
 
@@ -184,11 +175,8 @@ export class ReportingService {
      */
     static async getSalesByCashier(range: DateRange, limit: number = 10): Promise<{ cashierId: number; cashierName: string; totalRevenue: number; totalOrders: number }[]> {
         try {
-            const startDate = new Date(range.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(range.endDate);
-            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(`${range.startDate}T00:00:00.000Z`);
+            const endDate = new Date(`${range.endDate}T23:59:59.999Z`);
 
             const cashierPerformance = await prismaClient.order.groupBy({
                 by: ['cashier_id'],
@@ -245,11 +233,8 @@ export class ReportingService {
         range: DateRange
     ): Promise<{ date: string; orderCount: number }[]> {
         try {
-            const startDate = new Date(range.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(range.endDate);
-            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(`${range.startDate}T00:00:00.000Z`);
+            const endDate = new Date(`${range.endDate}T23:59:59.999Z`);
 
             const dailyOrders = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -266,7 +251,7 @@ export class ReportingService {
             // Map DB results into { date -> orderCount }
             const orderMap: Record<string, number> = {};
             dailyOrders.forEach(day => {
-                const dateKey = (day.order_date ?? new Date(0)).toISOString().slice(0, 10);
+                const dateKey = (day.order_date ?? new Date(0)).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                 orderMap[dateKey] = (orderMap[dateKey] ?? 0) + day._count.id;
             });
 
@@ -296,11 +281,8 @@ export class ReportingService {
         range: DateRange
     ): Promise<{ date: string; totalRevenue: number }[]> {
         try {
-            const startDate = new Date(range.startDate);
-            startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(range.endDate);
-            endDate.setHours(23, 59, 59, 999);
+            const startDate = new Date(`${range.startDate}T00:00:00.000Z`);
+            const endDate = new Date(`${range.endDate}T23:59:59.999Z`);
 
             const dailyRevenue = await prismaClient.order.groupBy({
                 by: ['order_date'],
@@ -317,7 +299,7 @@ export class ReportingService {
             // Map DB results into { date -> totalRevenue }
             const revenueMap: Record<string, number> = {};
             dailyRevenue.forEach(day => {
-                const dateKey = (day.order_date ?? new Date(0)).toISOString().slice(0, 10);
+                const dateKey = (day.order_date ?? new Date(0)).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
                 revenueMap[dateKey] = (revenueMap[dateKey] ?? 0) + (day._sum.total_price?.toNumber() || 0);
             });
 
@@ -339,6 +321,212 @@ export class ReportingService {
         } catch (error) {
             console.error("Error fetching daily revenue report:", error);
             throw new Error("Could not generate the daily revenue report.");
+        }
+    }
+
+    static async getTodaySalesStatistic(): Promise<{ title: string; value: string; change: string; trend: 'up' | 'down' | 'flat' }> {
+        try {
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+            const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStart = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0, 0);
+            const yesterdayEnd = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59, 999);
+
+            const todaySalesResult = await prismaClient.order.aggregate({
+                _sum: {
+                    total_price: true,
+                },
+                where: {
+                    order_date: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                },
+            });
+            const todaySales = todaySalesResult._sum.total_price?.toNumber() || 0;
+
+            const yesterdaySalesResult = await prismaClient.order.aggregate({
+                _sum: {
+                    total_price: true,
+                },
+                where: {
+                    order_date: {
+                        gte: yesterdayStart,
+                        lte: yesterdayEnd,
+                    },
+                },
+            });
+            const yesterdaySales = yesterdaySalesResult._sum.total_price?.toNumber() || 0;
+
+            let change = "0.0%";
+            let trend: 'up' | 'down' | 'flat' = 'flat';
+
+            if (yesterdaySales > 0) {
+                const percentageChange = ((todaySales - yesterdaySales) / yesterdaySales) * 100;
+                if (percentageChange > 0) {
+                    trend = 'up';
+                    change = `+${percentageChange.toFixed(1)}%`;
+                } else if (percentageChange < 0) {
+                    trend = 'down';
+                    change = `${percentageChange.toFixed(1)}%`;
+                } else {
+                    trend = 'flat';
+                    change = '0.0%';
+                }
+            } else if (todaySales > 0) {
+                trend = 'up';
+                change = '+100.0%';
+            }
+
+            return {
+                title: "Today's Sales",
+                value: todaySales.toString(),
+                change: change,
+                trend: trend,
+            };
+
+        } catch (error) {
+            console.error("Error fetching today's sales statistic:", error);
+            throw new Error("Could not generate today's sales statistic.");
+        }
+    }
+
+    static async getTodayOrdersStatistic(): Promise<{ title: string; value: string; change: string; trend: 'up' | 'down' | 'flat' }> {
+        try {
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+            const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStart = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0, 0);
+            const yesterdayEnd = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59, 999);
+
+            const todayOrders = await prismaClient.order.count({
+                where: {
+                    order_date: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                },
+            });
+
+            const yesterdayOrders = await prismaClient.order.count({
+                where: {
+                    order_date: {
+                        gte: yesterdayStart,
+                        lte: yesterdayEnd,
+                    },
+                },
+            });
+
+            let change = "0.0%";
+            let trend: 'up' | 'down' | 'flat' = 'flat';
+
+            if (yesterdayOrders > 0) {
+                const percentageChange = ((todayOrders - yesterdayOrders) / yesterdayOrders) * 100;
+                if (percentageChange > 0) {
+                    trend = 'up';
+                    change = `+${percentageChange.toFixed(1)}%`;
+                } else if (percentageChange < 0) {
+                    trend = 'down';
+                    change = `${percentageChange.toFixed(1)}%`;
+                } else {
+                    trend = 'flat';
+                    change = '0.0%';
+                }
+            } else if (todayOrders > 0) {
+                trend = 'up';
+                change = '+100.0%';
+            }
+
+            return {
+                title: "Orders",
+                value: todayOrders.toString(),
+                change: change,
+                trend: trend,
+            };
+
+        } catch (error) {
+            console.error("Error fetching today's orders statistic:", error);
+            throw new Error("Could not generate today's orders statistic.");
+        }
+    }
+
+    static async getTodayProductsSelledStatistic(): Promise<{ title: string; value: string; change: string; trend: 'up' | 'down' | 'flat' }> {
+        try {
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+            const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStart = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0, 0);
+            const yesterdayEnd = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59, 999);
+
+            const todayProductsSelledResult = await prismaClient.orderItem.aggregate({
+                _sum: {
+                    quantity: true,
+                },
+                where: {
+                    order: {
+                        order_date: {
+                            gte: todayStart,
+                            lte: todayEnd,
+                        },
+                    },
+                },
+            });
+            const todayProductsSelled = todayProductsSelledResult._sum.quantity || 0;
+
+            const yesterdayProductsSelledResult = await prismaClient.orderItem.aggregate({
+                _sum: {
+                    quantity: true,
+                },
+                where: {
+                    order: {
+                        order_date: {
+                            gte: yesterdayStart,
+                            lte: yesterdayEnd,
+                        },
+                    },
+                },
+            });
+            const yesterdayProductsSelled = yesterdayProductsSelledResult._sum.quantity || 0;
+
+            let change = "0.0%";
+            let trend: 'up' | 'down' | 'flat' = 'flat';
+
+            if (yesterdayProductsSelled > 0) {
+                const percentageChange = ((todayProductsSelled - yesterdayProductsSelled) / yesterdayProductsSelled) * 100;
+                if (percentageChange > 0) {
+                    trend = 'up';
+                    change = `+${percentageChange.toFixed(1)}%`;
+                } else if (percentageChange < 0) {
+                    trend = 'down';
+                    change = `${percentageChange.toFixed(1)}%`;
+                } else {
+                    trend = 'flat';
+                    change = '0.0%';
+                }
+            } else if (todayProductsSelled > 0) {
+                trend = 'up';
+                change = '+100.0%';
+            }
+
+            return {
+                title: "Products selling today",
+                value: todayProductsSelled.toString(),
+                change: change,
+                trend: trend,
+            };
+
+        } catch (error) {
+            console.error("Error fetching today's products selled statistic:", error);
+            throw new Error("Could not generate today's products selled statistic.");
         }
     }
 }

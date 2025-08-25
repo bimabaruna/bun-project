@@ -43,3 +43,19 @@ reportingController.post('/reports/revenue-each-day', async (c) => {
     const response = await ReportingService.getRevenueEachDay(range);
     return c.json({ data: response });
 });
+
+reportingController.get('/reports/today-sales-statistic', async (c) => {
+    const response = await ReportingService.getTodaySalesStatistic();
+    return c.json({ data: response });
+});
+
+reportingController.get('/reports/today-orders-statistic', async (c) => {
+    const response = await ReportingService.getTodayOrdersStatistic();
+    return c.json({ data: response });
+});
+
+
+reportingController.get('/reports/today-products-statistic', async (c) => {
+    const response = await ReportingService.getTodayProductsSelledStatistic();
+    return c.json({ data: response });
+});
