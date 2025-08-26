@@ -43,7 +43,7 @@ const Dashboard = () => {
 
   const statusMap: Record<string, string> = {
     paid: "Paid",
-    in_progress: "In Progress",
+    on_progress: "In Progress",
     cancelled: "Cancelled",
   };
 
