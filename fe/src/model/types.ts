@@ -88,3 +88,36 @@ export interface UserListResponse {
     totalCount: number;
     data: User[];
 }
+
+// Represents a single stock movement item from the API (camelCase, with typo)
+export interface ApiStockMovement {
+    id: number;
+    productId: number;
+    productName: string;
+    userId: number;
+    username: string;
+    quantity: number;
+    movementType: string;
+    orderId: number | null;
+    quantityChange: number;
+    quanityAfter: number; // Typo from API
+    createdAt: string;
+}
+
+// Represents the API response object for a list of stock movements
+export interface ApiStockMovementResponse {
+    data: ApiStockMovement[];
+}
+
+// Represents a stock movement object as used within the application (snake_case)
+export interface StockMovement {
+    id: number;
+    product_id: number;
+    product_name: string;
+    moved_by: string;
+    quantity: number;
+    movement_type: string;
+    quantity_change: number;
+    quantity_after: number;
+    created_at: string;
+}

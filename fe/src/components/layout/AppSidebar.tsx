@@ -11,6 +11,7 @@ import {
   MonitorSpeaker,
   Shield,
   BarChart3,
+  Truck
 } from "lucide-react";
 import {
   Sidebar,
@@ -25,8 +26,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainItems = [
-  { title: "POS Terminal", url: "/pos", icon: MonitorSpeaker },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "POS Terminal", url: "/pos", icon: MonitorSpeaker },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
 ];
 
@@ -38,6 +39,7 @@ const managementItems = [
   { title: "Users", url: "/users", icon: Users },
   { title: "Orders", url: "/orders", icon: ShoppingCart },
   { title: "Payments", url: "/payments", icon: CreditCard },
+  { title: "Stock Movements", url: "/stock-movements", icon: Truck },
 ];
 
 export function AppSidebar() {

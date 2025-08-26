@@ -121,9 +121,9 @@ export const PaymentModal = ({
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   Payment Successful
                 </DialogTitle>
-                <Button variant="ghost" size="sm" onClick={handleClose}>
+                {/* <Button variant="ghost" size="sm" onClick={handleClose}>
                   <X className="h-4 w-4" />
-                </Button>
+                </Button> */}
               </div>
             </DialogHeader>
 
@@ -143,7 +143,7 @@ export const PaymentModal = ({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Status:</span>
-                      <Badge variant="outline">{createdOrder.status}</Badge>
+                      <Badge variant="outline">Paid</Badge>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Payment Method:</span>

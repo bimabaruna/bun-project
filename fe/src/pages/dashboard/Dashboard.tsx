@@ -9,69 +9,43 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
+import { useOrders } from "@/hooks/useOrders";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { useEffect } from "react";
+import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import Index from "./Index";
+import { useTrends } from "@/hooks/useTrends";
+import { Trends } from "@/components/pos/Trends";
 
 const Dashboard = () => {
-  const stats = [
-    {
-      title: "Today's Sales",
-      value: "$2,847.50",
-      change: "+12.5%",
-      trend: "up",
-      icon: DollarSign,
-    },
-    {
-      title: "Orders",
-      value: "156",
-      change: "+8.2%",
-      trend: "up",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Products",
-      value: "324",
-      change: "-2.1%",
-      trend: "down",
-      icon: Package,
-    },
-    {
-      title: "Active Users",
-      value: "28",
-      change: "+5.4%",
-      trend: "up",
-      icon: Users,
-    },
-  ];
+  const { orders } = useOrders();
+  const navigate = useNavigate();
 
-  const recentOrders = [
-    {
-      id: "#ORD-001",
-      customer: "John Doe",
-      amount: 24.50,
-      status: "completed",
-      time: "2 mins ago",
-    },
-    {
-      id: "#ORD-002",
-      customer: "Jane Smith",
-      amount: 18.75,
-      status: "pending",
-      time: "5 mins ago",
-    },
-    {
-      id: "#ORD-003",
-      customer: "Mike Johnson",
-      amount: 32.00,
-      status: "completed",
-      time: "8 mins ago",
-    },
-  ];
+  const { mostSoldProducts, fetchAnalytics } = useAnalytics();
+  const { fetchOrderTrends, loading, orderTrends } = useTrends();
 
-  const topProducts = [
-    { name: "Latte", sales: 45, revenue: 202.50 },
-    { name: "Cappuccino", sales: 38, revenue: 152.00 },
-    { name: "Sandwich", sales: 22, revenue: 165.00 },
-    { name: "Croissant", sales: 31, revenue: 77.50 },
-  ];
+  useEffect(() => {
+    const today = new Date();
+    const formattedDate = format(today, "yyyy-MM-dd");
+    fetchAnalytics({ startDate: formattedDate, endDate: formattedDate });
+    fetchOrderTrends();
+  }, []);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const statusMap: Record<string, string> = {
+    paid: "Paid",
+    in_progress: "In Progress",
+    cancelled: "Cancelled",
+  };
 
   return (
     <div className="space-y-6">
@@ -83,35 +57,8 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title} className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="flex items-center text-xs text-muted-foreground">
-                {stat.trend === "up" ? (
-                  <TrendingUp className="h-3 w-3 mr-1 text-accent" />
-                ) : (
-                  <TrendingDown className="h-3 w-3 mr-1 text-destructive" />
-                )}
-                <span
-                  className={
-                    stat.trend === "up" ? "text-accent" : "text-destructive"
-                  }
-                >
-                  {stat.change}
-                </span>
-                <span className="ml-1">from yesterday</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div >
+        <Trends />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -122,37 +69,38 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
+              {orders.slice(0, 4).map((order) => (
                 <div
                   key={order.id}
                   className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                 >
                   <div>
-                    <p className="font-medium">{order.id}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium">#ID: {order.id}</p>
+                    {/* <p className="text-sm text-muted-foreground">
                       {order.customer}
-                    </p>
+                    </p> */}
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${order.amount.toFixed(2)}</p>
-                    <div className="flex items-center gap-2">
+                    <p className="font-medium">{formatCurrency(Number(order.total_price))}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-muted-foreground">
+                        {order.items.length} items
+                      </span>
                       <Badge
                         variant={
-                          order.status === "completed" ? "default" : "secondary"
+                          order.status === "paid" ? "default" : "secondary"
                         }
                         className="text-xs"
                       >
-                        {order.status}
+                        {statusMap[order.status]}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {order.time}
-                      </span>
+
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
+            <Button onClick={() => { navigate('/orders') }} variant="outline" className="w-full mt-4">
               View All Orders
             </Button>
           </CardContent>
@@ -165,9 +113,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topProducts.map((product, index) => (
+              {mostSoldProducts.map((product, index) => (
                 <div
-                  key={product.name}
+                  key={index}
                   className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
@@ -175,21 +123,16 @@ const Dashboard = () => {
                       {index + 1}
                     </div>
                     <div>
-                      <p className="font-medium">{product.name}</p>
+                      <p className="font-medium">{product.productName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {product.sales} sold
+                        {product.totalQuantitySold} sold
                       </p>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-accent">
-                      ${product.revenue.toFixed(2)}
-                    </p>
                   </div>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
+            <Button onClick={() => navigate('/analytics')} variant="outline" className="w-full mt-4">
               View All Products
             </Button>
           </CardContent>

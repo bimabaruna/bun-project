@@ -22,8 +22,9 @@ import CreateProduct from "./pages/dashboard/CreateProduct";
 import ProductDetail from "./pages/dashboard/ProductDetail";
 import CreateUser from "./pages/dashboard/CreateUser";
 import EditUser from "./pages/dashboard/EditUser";
-import LoginPage from "./pages/Login";
+import LoginPage from "@/pages/Login";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import StockMovements from "./pages/dashboard/StockMovements";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +35,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route
               path="/*"
@@ -50,20 +51,21 @@ const App = () => (
                       <main className="flex-1 p-6">
                         <Routes>
                           <Route path="/" element={<Index />} />
-                          <Route path="pos" element={<POSTerminal />} />
-                          <Route path="dashboard" element={<Dashboard />} />
-                          <Route path="analytics" element={<Analytics />} />
-                          <Route path="products" element={<Products />} />
-                          <Route path="products/:id" element={<ProductDetail />} />
-                          <Route path="products/create-product" element={<CreateProduct />} />
-                          <Route path="categories" element={<Categories />} />
-                          <Route path="outlets" element={<Outlets />} />
-                          <Route path="roles" element={<Roles />} />
-                          <Route path="users" element={<Users />} />
-                          <Route path="users/create-user" element={<CreateUser />} />
-                          <Route path="users/:id/edit" element={<EditUser />} />
-                          <Route path="orders" element={<Orders />} />
-                          <Route path="payments" element={<Payments />} />
+                          <Route path="/pos" element={<POSTerminal />} />
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route path="/analytics" element={<Analytics />} />
+                          <Route path="/products" element={<Products />} />
+                          <Route path="/products/:id" element={<ProductDetail />} />
+                          <Route path="/products/create-product" element={<CreateProduct />} />
+                          <Route path="/categories" element={<Categories />} />
+                          <Route path="/outlets" element={<Outlets />} />
+                          <Route path="/roles" element={<Roles />} />
+                          <Route path="/users" element={<Users />} />
+                          <Route path="/users/create-user" element={<CreateUser />} />
+                          <Route path="/users/:id/edit" element={<EditUser />} />
+                          <Route path="/orders" element={<Orders />} />
+                          <Route path="/payments" element={<Payments />} />
+                          <Route path="/stock-movements" element={<StockMovements />} />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </main>

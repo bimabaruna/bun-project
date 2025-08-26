@@ -103,7 +103,7 @@ export const useProduct = (productId?: number) => {
                 payload.imageUrl = imageUrl;
             }
             const response = await axios.patch(
-                `/api/products/${productId}`,
+                `/api/v3/products/${productId}`,
                 payload,
                 {
                     headers: {
