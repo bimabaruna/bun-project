@@ -50,7 +50,7 @@ const LoginForm = () => {
                             id="username"
                             type="text"
                             placeholder="Enter your username"
-                            value={username}
+                            value={username.toLocaleLowerCase()}
                             onChange={(e) => setUsername(e.target.value)}
                             className="h-12 border-gray-200 focus:border-gray-400 focus:ring-0 rounded-md"
                             disabled={isLoading}
