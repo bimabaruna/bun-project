@@ -1,5 +1,5 @@
 import type { User } from '@prisma/client';
-import { StockMovementType } from '@prisma/client';
+import { Orderstatus, StockMovementType } from '@prisma/client';
 import { prismaClient } from "../application/database";
 import { HTTPException } from "hono/http-exception";
 import { toOrderResponse, type CreateOrderRequest, type OrderListResponse, type OrderResponse } from "../model/order-model";
@@ -156,7 +156,7 @@ export class OrderService {
                 id: order.id
             },
             data: {
-                status: "canceled"
+                status: Orderstatus.cancelled
             }, include: {
                 order_items: {
                     include: {
@@ -268,7 +268,7 @@ export class OrderService {
                 data: {
                     cashier_id: user.id,
                     total_price: totalPrice,
-                    status: "on_progress", // Or your desired initial status
+                    status: Orderstatus.on_progress, // Or your desired initial status
                     order_items: {
                         create: orderItemsData
                     }

@@ -142,11 +142,11 @@ model Product {
 }
 
 model Order {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   cashier_id  Int
-  order_date  DateTime @default(now())
-  total_price Decimal  @db.Decimal(10, 2)
-  status      String   @default("on_progress")
+  order_date  DateTime    @default(now())
+  total_price Decimal     @db.Decimal(10, 2)
+  status      Orderstatus
 
   order_items     OrderItem[]
   payments        Payment[]
