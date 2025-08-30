@@ -404,7 +404,6 @@ export class ProductService {
                     }
                 } catch (error) {
                     console.error("Error deleting old image from GCS:", error);
-                    // Optional: Decide if you want to throw an error here or just log it
                 }
             }
 
