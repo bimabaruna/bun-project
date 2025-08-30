@@ -67,7 +67,7 @@ export const useProducts = (initialPageNumber = 1, pageSize = 10, searchTerm = "
     const deleteProduct = async (productId: string | number) => {
         const token = localStorage.getItem("token");
         try {
-            axios.delete(`/api/products/${productId}`, {
+            axios.delete(`/api/v3/products/${productId}`, {
                 headers: {
                     Authorization: token || ""
                 },
