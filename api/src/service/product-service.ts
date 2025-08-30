@@ -7,6 +7,7 @@ import { Readable } from 'stream'
 import { File } from 'formdata-node'
 import { bucket, bucketName } from '../utils/gcs'
 import * as crypto from 'crypto';
+import { supabase } from "../utils/supabase-client";
 
 export class ProductService {
 
@@ -393,16 +394,17 @@ export class ProductService {
             }
 
             // 2. Handle image deletion if a new image is provided or if it's explicitly removed
-            if (currentProduct.image_url && (updateRequest.imageUrl || updateRequest.imageUrl === null)) {
-                const fileName = currentProduct.image_url.split("/").pop();
-                if (fileName) {
-                    const file = bucket.file(`products/${fileName}`);
-                    const [exists] = await file.exists();
-                    if (exists) {
-                        await file.delete().catch(error => {
-                            console.error("Error deleting old file from GCS:", error);
-                        });
+            if (currentProduct.image_url && currentProduct.image_url !== updateRequest.imageUrl) {
+                try {
+                    const fileName = currentProduct.image_url.split("/").pop();
+                    if (fileName) {
+                        const file = bucket.file(`products/${fileName}`);
+                        const [exists] = await file.exists();
+                        if (exists) await file.delete();
                     }
+                } catch (error) {
+                    console.error("Error deleting old image from GCS:", error);
+                    // Optional: Decide if you want to throw an error here or just log it
                 }
             }
 
@@ -438,7 +440,6 @@ export class ProductService {
         });
 
         // 5. After the transaction is successful, fetch the final product with all relations.
-        // This ensures TypeScript has the correct type information.
         const finalProduct = await prismaClient.product.findUniqueOrThrow({
             where: { id: updatedProductId },
             include: {
@@ -470,15 +471,30 @@ export class ProductService {
 
         // Handle GCS image deletion
         if (product.image_url) {
-            const fileName = product.image_url.split("/").pop();
-            if (fileName) {
-                const file = bucket.file(`products/${fileName}`);
-                const [exists] = await file.exists();
-                if (exists) {
-                    await file.delete().catch(error => console.error("Error deleting file from GCS on soft delete:", error));
+            try {
+                // Always take the last part of the path (the actual file name)
+                const fileName = product.image_url.split("/").pop();
+
+                if (fileName) {
+                    const filePath = `products/${fileName}`;
+                    console.log(filePath)
+                    const { error } = await supabase.storage
+                        .from("images") // 👈 your bucket name
+                        .remove([filePath]);
+
+                    if (error) {
+                        console.error("❌ Error deleting file from Supabase Storage:", error.message);
+                    } else {
+                        console.log(`✅ File ${filePath} deleted successfully`);
+                    }
+                } else {
+                    console.warn("⚠️ Could not extract fileName from image_url:", product.image_url);
                 }
+            } catch (err) {
+                console.error("❌ Unexpected error deleting file from Supabase:", err);
             }
         }
+
 
         await prismaClient.product.update({
             where: { id: productIdNumber },

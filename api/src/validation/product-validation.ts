@@ -15,7 +15,8 @@ export class productValidation {
         name: z.string().min(1, { message: 'Product name cannot be empty' }).max(100),
         price: z.number().int().positive({ message: 'Price must bigger than 0' }),
         quantity: z.number().int(),
-        outletId: z.number().int().optional()
+        outletId: z.number().int().optional(),
+        imageUrl: z.string().optional()
     })
 
     static readonly GET: ZodType = z.number().positive()
