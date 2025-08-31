@@ -47,9 +47,13 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const isActive = (path: string) => currentPath === path;
-  const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive
+  const isActive = (path: string) => {
+    if (path === '/') return currentPath === '/';
+    return currentPath.startsWith(path);
+  }
+
+  const getNavCls = (path: string) =>
+    isActive(path)
       ? "bg-primary font-medium text-white"
       : "hover:bg-muted/50 text-foreground";
 
@@ -74,7 +78,7 @@ export function AppSidebar() {
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink to={item.url} className={getNavCls(item.url)}>
                       <item.icon className={`h-4 w-4`} />
                       <span className={`transition-all duration-200 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                         {item.title}
@@ -94,7 +98,7 @@ export function AppSidebar() {
               {managementItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink to={item.url} className={getNavCls(item.url)}>
                       <item.icon className={`h-4 w-4`} />
                       <span className={`transition-all duration-200 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                         {item.title}

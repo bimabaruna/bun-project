@@ -62,7 +62,7 @@ const LoginForm = () => {
                             id="username"
                             type="text"
                             placeholder="Enter your username"
-                            value={username}
+                            value={username.toLocaleLowerCase()}
                             onChange={(e) => {
                                 setUsername(e.target.value)
                                 if (errors.username) {
