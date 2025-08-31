@@ -16,6 +16,7 @@ import { OrderConfirmationDialog } from "@/components/pos/OrderConfirmationDialo
 import { PaymentModal } from "@/components/pos/PaymentModal";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { ImageOff } from "lucide-react"
 
 const POSTerminal = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -213,10 +214,19 @@ const POSTerminal = () => {
                           onClick={() => !isOutOfStock && addToCart(product)}
                         >
                           <CardContent className="p-4 text-center">
-                            <div className={`w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg ${isOutOfStock ? 'bg-muted' : 'bg-gradient-primary'
-                              }`}>
-                              {product.name.charAt(0)}
-                            </div>
+                            {product.imageUrl ? (
+                              <div>
+                                <img src={product.imageUrl}
+                                  className={`w-20 h-20 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg ${isOutOfStock ? 'bg-muted' : 'bg-gray-100'
+                                    }`}>
+
+
+                                </img>
+                              </div>
+                            ) : (
+                              <Skeleton className="w-20 h-20  text-center rounded-full mx-auto mb-2 flex items-center justify-center bg-gray-100"></Skeleton>
+
+                            )}
                             <h3 className={`font-medium text-sm mb-1 ${isOutOfStock ? 'text-muted-foreground' : ''}`}>
                               {product.name}
                             </h3>
@@ -257,18 +267,23 @@ const POSTerminal = () => {
                   </p>
                 ) : (
                   cart.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                    <div key={item.id} className="grid items-center gap-3 p-3 bg-muted/30 rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium">{item.name}</h4>
                         <p className="text-sm text-muted-foreground">
                           Rp. {item.price.toLocaleString()} pcs
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex justify-end items-center gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() => {
+                            if (item.quantity == 1) {
+                              removeFromCart(item.id)
+                            }
+                            updateQuantity(item.id, -1)
+                          }}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>

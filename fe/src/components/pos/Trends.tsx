@@ -1,6 +1,7 @@
 import { useTrends } from "@/hooks/useTrends";
 import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,18 +22,9 @@ export const Trends = () => {
         fetchProductTrends();
     }, []);
 
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(value);
-    };
-
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
+            <Card className="transition-all duration-200 hover:scale-105 hover:shadow-medium">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                         {salesTrends?.data?.title || "Loading..."}
@@ -62,7 +54,7 @@ export const Trends = () => {
                     </div>
                 </CardContent>
             </Card>
-            <Card>
+            <Card className="transition-all duration-200 hover:scale-105 hover:shadow-medium">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                         {orderTrends?.data?.title || "Loading..."}
@@ -92,7 +84,7 @@ export const Trends = () => {
                     </div>
                 </CardContent>
             </Card>
-            <Card>
+            <Card className="transition-all duration-200 hover:scale-105 hover:shadow-medium">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                         {productTrends?.data?.title || "Loading..."}

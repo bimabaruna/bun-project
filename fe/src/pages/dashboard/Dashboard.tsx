@@ -1,22 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DollarSign,
-  ShoppingCart,
-  Package,
-  Users,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
 import { useOrders } from "@/hooks/useOrders";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useEffect } from "react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import Index from "./Index";
 import { useTrends } from "@/hooks/useTrends";
 import { Trends } from "@/components/pos/Trends";
+import { formatCurrency } from "@/lib/utils";
 
 const Dashboard = () => {
   const { orders } = useOrders();
@@ -32,14 +24,6 @@ const Dashboard = () => {
     fetchOrderTrends();
   }, []);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
 
   const statusMap: Record<string, string> = {
     paid: "Paid",
@@ -57,7 +41,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div >
+      <div>
         <Trends />
       </div>
 

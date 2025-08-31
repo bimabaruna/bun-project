@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarIcon, TrendingUp, DollarSign, Users, Package } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { addDays, format } from 'date-fns';
+import { formatCurrency } from '@/lib/utils';
 
 const chartConfig = {
   orders: {
@@ -72,15 +73,6 @@ export default function Analytics() {
     handleFetchData();
   }, []);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -113,7 +105,7 @@ export default function Analytics() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className='transition-all duration-200 hover:scale-105 hover:shadow-medium'>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -132,7 +124,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className='transition-all duration-200 hover:scale-105 hover:shadow-medium'>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -151,7 +143,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className='transition-all duration-200 hover:scale-105 hover:shadow-medium'>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Cashiers</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -168,7 +160,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className='transition-all duration-200 hover:scale-105 hover:shadow-medium'>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Top Products</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />

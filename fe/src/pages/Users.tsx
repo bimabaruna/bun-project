@@ -33,7 +33,7 @@ const Users = () => {
           <h1 className="text-3xl font-bold tracking-tight">Users</h1>
           <p className="text-muted-foreground">Manage user accounts and permissions.</p>
         </div>
-        <Button 
+        <Button
           className="bg-gradient-primary"
           onClick={() => navigate("/users/create-user")}
         >
@@ -49,7 +49,7 @@ const Users = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>Username</TableHead>
                 <TableHead>Role</TableHead>
                 {/* <TableHead>Status</TableHead> */}
                 <TableHead className="text-right">Actions</TableHead>
@@ -79,9 +79,9 @@ const Users = () => {
                         <h3 className="font-medium text-foreground">No users found</h3>
                         <p className="text-sm">Add team members to manage your store operations.</p>
                       </div>
-                      <Button 
-                        onClick={() => navigate("/users/create-user")} 
-                        size="sm" 
+                      <Button
+                        onClick={() => navigate("/users/create-user")}
+                        size="sm"
                         className="mt-2 bg-gradient-primary"
                       >
                         <Plus className="h-4 w-4 mr-2" />
@@ -99,8 +99,8 @@ const Users = () => {
                     {/* <TableCell><Badge variant={user.status === "active" ? "default" : "secondary"}>{user.status}</Badge></TableCell> */}
                     <TableCell className="text-right">
                       <div className="flex gap-2 justify-end">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => navigate(`/users/${user.id}/edit`)}
                         >

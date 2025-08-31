@@ -10,21 +10,33 @@ const LoginForm = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<{ username?: string, password?: string }>({});
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError(null)
+        const newErrors: { username?: string, password?: string } = {}
+
+        if (!username) newErrors.username = "Username is required!"
+        if (!password) newErrors.password = "Password is required"
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            return
+        }
+        setIsLoading(true)
         try {
-            const response = await axios.post('/api/users/login', { username, password });
+            const response = await axios.post(`/api/users/login`, { username, password });
             const token = response.data.data.token;
-            console.log(token)
             localStorage.setItem('token', token);
-            setIsLoading(true);
-            navigate('/');
-            setIsLoading(false);
-        } catch (err) {
+
+            navigate('/dashboard');
+        } catch (err: any) {
             setError('Invalid username or password');
+        } finally {
+            setIsLoading(false)
         }
     };
 
@@ -50,11 +62,20 @@ const LoginForm = () => {
                             id="username"
                             type="text"
                             placeholder="Enter your username"
-                            value={username.toLocaleLowerCase()}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={username}
+                            onChange={(e) => {
+                                setUsername(e.target.value)
+                                if (errors.username) {
+                                    setErrors((prev) => ({ ...prev, username: undefined }))
+                                }
+                            }}
                             className="h-12 border-gray-200 focus:border-gray-400 focus:ring-0 rounded-md"
                             disabled={isLoading}
-                        />
+                        />{
+                            errors.username && (
+                                <label className="text-sm font-small text-red-500">{errors.username}</label>
+                            )
+                        }
                     </div>
 
                     <div className="space-y-1">
@@ -66,10 +87,19 @@ const LoginForm = () => {
                             type="password"
                             placeholder="Enter your password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => {
+                                setPassword(e.target.value)
+                                if (errors.password) {
+                                    setErrors((prev) => ({ ...prev, password: undefined }))
+                                }
+                            }}
                             className="h-12 border-gray-200 focus:border-gray-400 focus:ring-0 rounded-md"
                             disabled={isLoading}
                         />
+                        {
+                            errors.password && (
+                                <label className="text-sm font-small text-red-500">{errors.password}</label>
+                            )}
                     </div>
 
                     {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
