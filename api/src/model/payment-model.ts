@@ -1,9 +1,22 @@
 import type { Payment } from "@prisma/client"
 import type { Decimal } from "@prisma/client/runtime/library"
+import { number } from "zod"
 
 export type PaymentResponse = {
     id: number,
     message: string
+}
+
+export type PaymentListResponse = {
+    data: PaymentData[]
+}
+
+export type PaymentData = {
+    id: number,
+    order_id: number,
+    amount: Decimal,
+    method: string,
+
 }
 
 export type PaymentRequest = {

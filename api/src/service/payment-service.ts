@@ -1,8 +1,8 @@
 import { prismaClient } from "../application/database";
-import { Orderstatus, type User } from "@prisma/client";
+import { Orderstatus, PaymentStatus, type User } from "@prisma/client";
 import { paymentValidation } from "../validation/payment-validation";
 import { HTTPException } from "hono/http-exception";
-import { type PaymentRequest, type PaymentResponse } from "../model/payment-model";
+import { type PaymentListResponse, type PaymentRequest, type PaymentResponse } from "../model/payment-model";
 
 export class PaymentService {
     static async create(user: User, request: PaymentRequest): Promise<PaymentResponse> {
@@ -32,7 +32,8 @@ export class PaymentService {
                 data: {
                     order_id: request.order_id,
                     amount: request.amount,
-                    method: request.method
+                    method: request.method,
+                    status: PaymentStatus.paid
                 }
             }),
             prismaClient.order.update({
@@ -45,5 +46,22 @@ export class PaymentService {
             id: payment.id,
             message: "Payment success, order has been paid!"
         };
+    }
+
+    static async getList(): Promise<PaymentListResponse> {
+        const payment = await prismaClient.payment.findMany({})
+
+        const mapped = payment.map((payments) => {
+            return {
+                id: payments.id,
+                order_id: payments.order_id,
+                paymet_date: payments.payment_date,
+                amount: payments.amount,
+                method: payments.method,
+                status: payments.status
+            }
+        })
+
+        return { data: mapped }
     }
 }

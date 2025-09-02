@@ -20,3 +20,9 @@ paymentController.post('/payment', authMiddleware, async (c) => {
         data: response
     })
 })
+
+paymentController.get('/payment', authMiddleware, async (c) => {
+    const response = await PaymentService.getList()
+
+    return c.json(response)
+})

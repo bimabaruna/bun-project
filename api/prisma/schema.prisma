@@ -171,11 +171,11 @@ model OrderItem {
 }
 
 model Payment {
-  id           Int      @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   order_id     Int
-  payment_date DateTime @default(now())
-  amount       Decimal  @db.Decimal(10, 2)
-  status       String   @default("paid")
+  payment_date DateTime      @default(now())
+  amount       Decimal       @db.Decimal(10, 2)
+  status       PaymentStatus
 
   method String
   order  Order  @relation(fields: [order_id], references: [id])
@@ -238,6 +238,11 @@ model StockMovement {
   order   Order?  @relation(fields: [order_id], references: [id])
 
   @@map("stock_movements")
+}
+
+enum PaymentStatus {
+  unpaid
+  paid
 }
 
 enum StockMovementType {
