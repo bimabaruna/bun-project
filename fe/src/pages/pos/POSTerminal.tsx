@@ -17,6 +17,7 @@ import { PaymentModal } from "@/components/pos/PaymentModal";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { ImageOff } from "lucide-react"
+import { Value } from "@radix-ui/react-select";
 
 const POSTerminal = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -117,8 +118,6 @@ const POSTerminal = () => {
       setIsProcessingOrder(false);
     }
   };
-
-
 
   const handleCreateOrder = () => {
     if (cart.length === 0) {
@@ -266,7 +265,11 @@ const POSTerminal = () => {
                     No items in cart
                   </p>
                 ) : (
-                  cart.map((item) => (
+                  cart.map((item) => {
+                    const product = products.find(p => p.id === item.id);
+                    const isMaxQuantity = product && item.quantity >= product.quantity;
+                    
+                    return (
                     <div key={item.id} className="grid items-center gap-3 p-3 bg-muted/30 rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium">{item.name}</h4>
@@ -292,6 +295,7 @@ const POSTerminal = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => updateQuantity(item.id, 1)}
+                          disabled={isMaxQuantity}
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
@@ -304,7 +308,8 @@ const POSTerminal = () => {
                         </Button>
                       </div>
                     </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

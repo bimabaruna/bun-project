@@ -88,15 +88,17 @@ export default function Analytics() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Comprehensive business insights and performance metrics</p>
+    <div className="space-y-6 w-full max-w-full overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 md:gap-6 w-full">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Comprehensive business insights and performance metrics</p>
         </div>
-        <div className="flex items-center gap-4">
-          <DatePickerWithRange date={dateRange} onDateChange={handleDateChange} />
-          <Button onClick={handleFetchData} disabled={loading}>
+        <div className="flex flex-col sm:flex-row justify-start lg:justify-end items-stretch sm:items-center gap-3 md:gap-4 flex-shrink-0">
+          <div className="w-full sm:w-auto">
+            <DatePickerWithRange date={dateRange} onDateChange={handleDateChange} />
+          </div>
+          <Button onClick={handleFetchData} disabled={loading} className="w-full sm:w-auto">
             <CalendarIcon className="mr-2 h-4 w-4" />
             {loading ? 'Loading...' : 'Update Data'}
           </Button>
@@ -104,7 +106,7 @@ export default function Analytics() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <Card className='transition-all duration-200 hover:scale-105 hover:shadow-medium'>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -179,19 +181,19 @@ export default function Analytics() {
       </div>
 
       {/* Charts Grid */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 md:gap-6">
         {/* Orders Per Day Chart */}
         <Card>
-          <CardHeader>
-            <CardTitle>Daily Orders</CardTitle>
-            <CardDescription>Order volume over time</CardDescription>
+          <CardHeader className="pb-3 md:pb-6">
+            <CardTitle className="text-lg md:text-xl">Daily Orders</CardTitle>
+            <CardDescription className="text-sm">Order volume over time</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-48 md:h-64 w-full" />
             ) : (
-              <ChartContainer config={chartConfig} className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+               <ChartContainer config={chartConfig} className="h-48 md:h-64 w-full min-w-0">
+                 <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                   <BarChart data={ordersEachDay}>
                     <XAxis
                       dataKey="date"
@@ -210,16 +212,16 @@ export default function Analytics() {
 
         {/* Revenue Per Day Chart */}
         <Card>
-          <CardHeader>
-            <CardTitle>Daily Revenue</CardTitle>
-            <CardDescription>Revenue trends over time</CardDescription>
+          <CardHeader className="pb-3 md:pb-6">
+            <CardTitle className="text-lg md:text-xl">Daily Revenue</CardTitle>
+            <CardDescription className="text-sm">Revenue trends over time</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-48 md:h-64 w-full" />
             ) : (
-              <ChartContainer config={chartConfig} className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+               <ChartContainer config={chartConfig} className="h-48 md:h-64 w-full min-w-0">
+                 <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                   <LineChart data={revenueEachDay}>
                     <XAxis
                       dataKey="date"
@@ -248,16 +250,16 @@ export default function Analytics() {
 
         {/* Sales by Cashier Chart */}
         <Card>
-          <CardHeader>
-            <CardTitle>Cashier Performance</CardTitle>
-            <CardDescription>Revenue by cashier</CardDescription>
+          <CardHeader className="pb-3 md:pb-6">
+            <CardTitle className="text-lg md:text-xl">Cashier Performance</CardTitle>
+            <CardDescription className="text-sm">Revenue by cashier</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-48 md:h-64 w-full" />
             ) : (
-              <ChartContainer config={chartConfig} className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+               <ChartContainer config={chartConfig} className="h-48 md:h-64 w-full min-w-0">
+                 <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                   <BarChart data={salesByCashier} layout="horizontal">
                     <XAxis type="category" dataKey="cashierName" width={80} style={{ fontSize: '10px' }} />
                     <YAxis type="number" tickFormatter={(value) => formatCurrency(value)} style={{ fontSize: '10px' }} />
@@ -276,16 +278,16 @@ export default function Analytics() {
 
         {/* Most Sold Products Chart */}
         <Card>
-          <CardHeader>
-            <CardTitle>Best Selling Products</CardTitle>
-            <CardDescription>Top products by quantity sold</CardDescription>
+          <CardHeader className="pb-3 md:pb-6">
+            <CardTitle className="text-lg md:text-xl">Best Selling Products</CardTitle>
+            <CardDescription className="text-sm">Top products by quantity sold</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-48 md:h-64 w-full" />
             ) : (
-              <ChartContainer config={chartConfig} className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+               <ChartContainer config={chartConfig} className="h-48 md:h-64 w-full min-w-0">
+                 <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                   <PieChart>
                     <Pie
                       data={mostSoldProducts}
