@@ -56,6 +56,7 @@ export class StockMovementsService {
                 quantity: movement.product.quantity,
                 movementType: movement.type,
                 orderId: movement.order_id ?? null,
+                quantityBefore: (movement.new_quantity ?? 0) - (movement.quantity_changed ?? 0),
                 quantityChange: movement.quantity_changed ?? 0,
                 quanityAfter: movement.new_quantity ?? 0,
                 createdAt: movement.created_at,

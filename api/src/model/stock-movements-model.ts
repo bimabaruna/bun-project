@@ -17,6 +17,7 @@ export type StockMovementResponse = {
     quantity: number;
     movementType: string;
     orderId?: number | null;
+    quantityBefore: number;
     quantityChange: number;
     quanityAfter: number;
     note?: string | null;
