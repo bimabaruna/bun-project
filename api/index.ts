@@ -16,6 +16,7 @@ import { outletController } from "./src/controller/outlet-controller";
 import { employeeController } from "./src/controller/empoylee-controller";
 import { stockMovementController } from "./src/controller/stock-movements-controller";
 import { reportingController } from "./src/controller/reporting-controller";
+import { billController } from "./src/controller/bill-controller";
 
 const app = new Hono()
 
@@ -48,6 +49,7 @@ app.route('/api', outletController)
 app.route('/api', employeeController)
 app.route('/api', stockMovementController)
 app.route('/api', reportingController)
+app.route('/api', billController)
 
 app.use('*', serveStatic({ root: './fe/dist' }));
 app.get('*', serveStatic({ path: './fe/dist/index.html' }))
