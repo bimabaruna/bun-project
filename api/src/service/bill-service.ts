@@ -126,65 +126,65 @@ export class BillService {
         const formatDate = (date: Date) => new Date(date).toLocaleString("id-ID");
 
         return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-  body{font-family:'Courier New',monospace;font-size:12px;margin:0;padding:0;}
-  .bill-content{width:76mm;margin:0 auto;}
-  .separator{border-top:1px dashed #000;margin:8px 0;}
-  .flex{display:flex;justify-content:space-between;}
-  .text-center{text-align:center;}
-  .font-bold{font-weight:bold;}
-  .font-semibold{font-weight:600;}
-  .text-lg{font-size:16px;}
-  .text-base{font-size:14px;}
-  .text-xs{font-size:10px;}
-  .pl-2{padding-left:8px;}
-  .uppercase{text-transform:uppercase;}
-  .space-y-1>*+*{margin-top:4px;}
-  .space-y-2>*+*{margin-top:8px;}
-  .space-y-3>*+*{margin-top:12px;}
-</style>
-</head>
-<body>
-<div id="printable-bill" class="bill-content space-y-3 text-sm font-mono">
-  <div class="text-center space-y-1">
-    <h2 class="text-lg font-bold">${outlet.outlet_name}</h2>
-    <p class="text-xs">${outlet.address}</p>
-    <p class="text-xs">${outlet.phone}</p>
-  </div>
-  <div class="separator"></div>
-  <div class="space-y-1 text-xs">
-    <div class="flex"><span>Order #:</span><span class="font-semibold">${order.id}</span></div>
-    <div class="flex"><span>Date:</span><span>${formatDate(order.order_date)}</span></div>
-    <div class="flex"><span>Cashier:</span><span>${order.user.name}</span></div>
-    <div class="flex"><span>Status:</span><span class="uppercase">${order.status}</span></div>
-  </div>
-  <div class="separator"></div>
-  <div class="space-y-2">
-    ${order.order_items.map((item: any) => {
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <style>
+            body{font-family:'Courier New',monospace;font-size:12px;margin:0;padding:0;}
+            .bill-content{width:76mm;margin:0 auto;}
+            .separator{border-top:1px dashed #000;margin:8px 0;}
+            .flex{display:flex;justify-content:space-between;}
+            .text-center{text-align:center;}
+            .font-bold{font-weight:bold;}
+            .font-semibold{font-weight:600;}
+            .text-lg{font-size:16px;}
+            .text-base{font-size:14px;}
+            .text-xs{font-size:10px;}
+            .pl-2{padding-left:8px;}
+            .uppercase{text-transform:uppercase;}
+            .space-y-1>*+*{margin-top:4px;}
+            .space-y-2>*+*{margin-top:8px;}
+            .space-y-3>*+*{margin-top:12px;}
+            </style>
+            </head>
+            <body>
+            <div id="printable-bill" class="bill-content space-y-3 text-sm font-mono">
+            <div class="text-center space-y-1">
+            <h2 class="text-lg font-bold">${outlet.outlet_name}</h2>
+            <p class="text-xs">${outlet.address}</p>
+            <p class="text-xs">${outlet.phone}</p>
+            </div>
+            <div class="separator"></div>
+            <div class="space-y-1 text-xs">
+            <div class="flex"><span>Order #:</span><span class="font-semibold">${order.id}</span></div>
+            <div class="flex"><span>Date:</span><span>${formatDate(order.order_date)}</span></div>
+            <div class="flex"><span>Cashier:</span><span>${order.user.name}</span></div>
+            <div class="flex"><span>Status:</span><span class="uppercase">${order.status}</span></div>
+            </div>
+            <div class="separator"></div>
+            <div class="space-y-2">
+            ${order.order_items.map((item: any) => {
             const itemTotal = item.quantity * Number(item.price_at_order);
             return `<div class=\"space-y-1\">
-        <div class=\"flex font-semibold\"><span>${item.product.name}</span></div>
-        <div class=\"flex text-xs pl-2\">
-          <span>${item.quantity} x Rp. ${formatCurrency(item.price_at_order)}</span>
-          <span>Rp. ${formatCurrency(itemTotal)}</span>
-        </div>
-      </div>`;
+                <div class=\"flex font-semibold\"><span>${item.product.name}</span></div>
+                <div class=\"flex text-xs pl-2\">
+                    <span>${item.quantity} x Rp. ${formatCurrency(item.price_at_order)}</span>
+                    <span>Rp. ${formatCurrency(itemTotal)}</span>
+                </div>
+                </div>`;
         }).join('')}
-  </div>
-  <div class="separator"></div>
-  <div class="space-y-1">
-    <div class="flex text-base font-bold"><span>TOTAL:</span><span>Rp. ${formatCurrency(total)}</span></div>
-  </div>
-  <div class="separator"></div>
-  <div class="text-center text-xs space-y-1">
-    <p>Thank you for your purchase!</p>
-    <p>Please come again</p>
-  </div>
-</div>
-</body>
-</html>`;
+            </div>
+            <div class="separator"></div>
+            <div class="space-y-1">
+            <div class="flex text-base font-bold"><span>TOTAL:</span><span>Rp. ${formatCurrency(total)}</span></div>
+            </div>
+            <div class="separator"></div>
+            <div class="text-center text-xs space-y-1">
+            <p>Thank you for your purchase!</p>
+            <p>Please come again</p>
+            </div>
+            </div>
+            </body>
+            </html>`;
     }
 }
