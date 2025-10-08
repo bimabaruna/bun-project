@@ -100,6 +100,7 @@ export class OrderService {
             id: Number(order.id),
             cashier_id: user.id,
             total_price: order.total_price,
+            order_date: order.order_date,
             status: order.status,
             items: order.order_items.map(item => ({
                 product_id: item.product_id,
